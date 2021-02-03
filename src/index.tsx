@@ -4,13 +4,16 @@ import { client } from "./apollo";
 import React from "react";
 import "./styles/styles.css";
 
-import App from "./App";
+import App from "./components/App";
+import { HelmetProvider } from "react-helmet-async";
 
 const rootElement = document.getElementById("root");
 render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <App />
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
     </ApolloProvider>
   </React.StrictMode>,
   rootElement

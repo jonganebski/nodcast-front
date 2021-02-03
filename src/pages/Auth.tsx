@@ -1,7 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { TOKEN_NAME } from "../constants";
+import { AUTH_FORM, EMAIL_REGEX, TOKEN_NAME } from "../constants";
 import { authTokenVar, isLoggedInVar } from "../apollo";
 import { FormError } from "../components/FormError";
 import {
@@ -13,15 +13,16 @@ import {
   logInMutation,
   logInMutationVariables,
 } from "../__generated__/logInMutation";
+import { Helmet } from "react-helmet-async";
 
-interface IFormProps {
+export interface IAuthFormProps {
   email: string;
   role: UserRole;
   password: string;
   checkPassword: string;
 }
 
-const CREATE_ACCOUNT_MUTATION = gql`
+export const CREATE_ACCOUNT_MUTATION = gql`
   mutation createAccountMutation($input: CreateAccountInput!) {
     createAccount(input: $input) {
       ok
@@ -30,7 +31,7 @@ const CREATE_ACCOUNT_MUTATION = gql`
   }
 `;
 
-const LOG_IN_MUTATION = gql`
+export const LOG_IN_MUTATION = gql`
   mutation logInMutation($input: LoginInput!) {
     login(input: $input) {
       ok
@@ -43,13 +44,15 @@ const LOG_IN_MUTATION = gql`
 export const Auth = () => {
   const [isSignIn, setIsSignIn] = useState(true);
   const [outputErr, setOutputErr] = useState("");
+  const passwordInputRef = useRef<HTMLInputElement | null>(null);
   const {
     register,
     getValues,
     handleSubmit,
     errors,
     formState,
-  } = useForm<IFormProps>({
+    reset,
+  } = useForm<IAuthFormProps>({
     mode: "onChange",
   });
 
@@ -57,26 +60,26 @@ export const Auth = () => {
     const {
       createAccount: { ok, error },
     } = data;
-    if (ok && !error) {
+    if (ok) {
       setIsSignIn(true);
-    } else {
-      if (error) {
-        setOutputErr(error);
-      }
+      reset({ email: getValues().email });
+      passwordInputRef.current?.focus();
+    }
+    if (error) {
+      setOutputErr(error);
     }
   };
   const onLoginCompleted = (data: logInMutation) => {
     const {
       login: { ok, error, token },
     } = data;
-    if (ok && !error && token) {
+    if (ok && token) {
       localStorage.setItem(TOKEN_NAME, token);
       authTokenVar(token);
       isLoggedInVar(true);
-    } else {
-      if (error) {
-        setOutputErr(error);
-      }
+    }
+    if (error) {
+      setOutputErr(error);
     }
   };
 
@@ -109,6 +112,9 @@ export const Auth = () => {
 
   return (
     <div className="w-full max-w-2xl mx-auto mt-20">
+      <Helmet>
+        <title>{isSignIn ? "Sign in" : "Create account"} | Nodcast</title>
+      </Helmet>
       <header className="py-10 text-center text-2xl">
         {isSignIn ? "Sign in " : "Create account "}
         <div className="inline-block cursor-pointer transition duration-700 ease-in-out transform hover:rotate-12">
@@ -131,13 +137,19 @@ export const Auth = () => {
               💌
             </span>
             <input
-              ref={register({ required: "Email field is required" })}
+              ref={register({
+                required: AUTH_FORM.EMAIL_REQUIRED_ERR,
+                pattern: {
+                  value: EMAIL_REGEX,
+                  message: AUTH_FORM.EMAIL_INVALID_ERR,
+                },
+              })}
               name="email"
               className="border px-10 py-2"
               type="email"
               placeholder="Email"
             />
-            <FormError err={errors.email?.message} />
+            {errors.email && <FormError err={errors.email.message} />}
           </label>
           {!isSignIn && (
             <label className="grid gap-2">
@@ -145,15 +157,18 @@ export const Auth = () => {
                 ref={register({ required: "Role field is required" })}
                 name="role"
                 className="border px-1 py-2"
+                data-testid="user-role-select"
               >
-                <option value={UserRole.Listener}>
+                <option
+                  value={UserRole.Listener}
+                  data-testid="user-role-option"
+                >
                   {"🎧"}&nbsp;&nbsp;{UserRole.Listener}
                 </option>
-                <option value={UserRole.Host}>
+                <option value={UserRole.Host} data-testid="user-role-option">
                   {"🎙"}&nbsp;&nbsp;{UserRole.Host}
                 </option>
               </select>
-              <FormError err={errors.role?.message} />
             </label>
           )}
           <label className=" relative grid gap-2">
@@ -161,19 +176,22 @@ export const Auth = () => {
               🔑
             </span>
             <input
-              ref={register({
-                required: "Password field is required",
-                minLength: {
-                  value: 6,
-                  message: "Minimum password length is 6",
-                },
-              })}
+              ref={(ref) => {
+                passwordInputRef.current = ref;
+                register(ref, {
+                  required: AUTH_FORM.PASS_REQUIRED_ERR,
+                  minLength: {
+                    value: AUTH_FORM.PASS_MIN_LENGTH,
+                    message: AUTH_FORM.PASS_MIN_LENGTH_ERR,
+                  },
+                });
+              }}
               name="password"
               className="border px-10 py-2"
               type="password"
               placeholder="Password"
             />
-            <FormError err={errors.password?.message} />
+            {errors.password && <FormError err={errors.password.message} />}
           </label>
           {!isSignIn && (
             <label className="relative grid gap-2">
@@ -186,11 +204,11 @@ export const Auth = () => {
               </span>
               <input
                 ref={register({
-                  required: "Check password field is required",
+                  required: AUTH_FORM.CHECK_PASS_REQUIRED_ERR,
                   validate: (v) => {
                     const isValid = v === getValues().password;
                     if (!isValid) {
-                      return "Passwords does not match";
+                      return AUTH_FORM.CHECK_PASS_INVALID_ERR;
                     }
                     return true;
                   },
@@ -200,7 +218,9 @@ export const Auth = () => {
                 type="password"
                 placeholder="Check password"
               />
-              <FormError err={errors.checkPassword?.message} />
+              {errors.checkPassword && (
+                <FormError err={errors.checkPassword.message} />
+              )}
             </label>
           )}
           <div>
@@ -226,7 +246,7 @@ export const Auth = () => {
                 <span>{isSignIn ? "Sign in" : "Create account"}</span>
               )}
             </button>
-            <FormError err={outputErr} />
+            {outputErr && <FormError err={outputErr} />}
           </div>
           <div className="text-center py-10">
             {isSignIn ? (
@@ -236,7 +256,7 @@ export const Auth = () => {
                   className="underline cursor-pointer"
                   onClick={() => setIsSignIn(false)}
                 >
-                  Create account
+                  Create an account
                 </span>
               </span>
             ) : (

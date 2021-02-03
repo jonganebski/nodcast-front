@@ -3,6 +3,8 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
+import { Categories } from "./globalTypes";
+
 // ====================================================
 // GraphQL query operation: getAllPodcastsQuery
 // ====================================================
@@ -11,7 +13,7 @@ export interface getAllPodcastsQuery_getAllPodcasts_podcasts {
   __typename: "Podcast";
   id: number;
   title: string;
-  category: string;
+  category: Categories;
   rating: number;
   updatedAt: any;
 }

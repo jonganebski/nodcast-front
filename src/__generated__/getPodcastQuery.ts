@@ -3,7 +3,7 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { PodcastSearchInput } from "./globalTypes";
+import { PodcastSearchInput, Categories } from "./globalTypes";
 
 // ====================================================
 // GraphQL query operation: getPodcastQuery
@@ -19,6 +19,7 @@ export interface getPodcastQuery_getPodcast_podcast_episodes {
   id: number;
   title: string;
   createdAt: any;
+  description: string | null;
 }
 
 export interface getPodcastQuery_getPodcast_podcast_reviews {
@@ -31,7 +32,8 @@ export interface getPodcastQuery_getPodcast_podcast {
   __typename: "Podcast";
   id: number;
   title: string;
-  category: string;
+  category: Categories;
+  description: string;
   creator: getPodcastQuery_getPodcast_podcast_creator;
   episodes: getPodcastQuery_getPodcast_podcast_episodes[];
   reviews: getPodcastQuery_getPodcast_podcast_reviews[];

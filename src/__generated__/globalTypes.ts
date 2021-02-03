@@ -7,6 +7,20 @@
 // START Enums and Input Objects
 //==============================================================
 
+export enum Categories {
+  Arts = "Arts",
+  Business = "Business",
+  Comedy = "Comedy",
+  Education = "Education",
+  Flex = "Flex",
+  Health = "Health",
+  NewsAndPolitics = "NewsAndPolitics",
+  SocietyAndCulture = "SocietyAndCulture",
+  SportsAndRecreation = "SportsAndRecreation",
+  TVAndFilm = "TVAndFilm",
+  Technology = "Technology",
+}
+
 export enum UserRole {
   Host = "Host",
   Listener = "Listener",
@@ -25,6 +39,11 @@ export interface LoginInput {
 
 export interface PodcastSearchInput {
   id: number;
+}
+
+export interface SearchPodcastsInput {
+  page?: number | null;
+  titleQuery: string;
 }
 
 //==============================================================
