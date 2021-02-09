@@ -26,7 +26,7 @@ export const CREATE_ACCOUNT_MUTATION = gql`
   mutation createAccountMutation($input: CreateAccountInput!) {
     createAccount(input: $input) {
       ok
-      error
+      err
     }
   }
 `;
@@ -35,7 +35,7 @@ export const LOG_IN_MUTATION = gql`
   mutation logInMutation($input: LoginInput!) {
     login(input: $input) {
       ok
-      error
+      err
       token
     }
   }
@@ -58,28 +58,28 @@ export const Auth = () => {
 
   const onCreateAccountCompleted = (data: createAccountMutation) => {
     const {
-      createAccount: { ok, error },
+      createAccount: { ok, err },
     } = data;
     if (ok) {
       setIsSignIn(true);
       reset({ email: getValues().email });
       passwordInputRef.current?.focus();
     }
-    if (error) {
-      setOutputErr(error);
+    if (err) {
+      setOutputErr(err);
     }
   };
   const onLoginCompleted = (data: logInMutation) => {
     const {
-      login: { ok, error, token },
+      login: { ok, err, token },
     } = data;
     if (ok && token) {
       localStorage.setItem(TOKEN_NAME, token);
       authTokenVar(token);
       isLoggedInVar(true);
     }
-    if (error) {
-      setOutputErr(error);
+    if (err) {
+      setOutputErr(err);
     }
   };
 

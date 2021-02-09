@@ -1,5 +1,7 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
+  faCheck,
+  faPenNib,
   faPlus,
   faSortAmountDown,
   faSortAmountDownAlt,
@@ -8,37 +10,59 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useParams } from "react-router-dom";
+import { client } from "../apollo";
+import { Button } from "../components/Button";
 import { EpisodeBlock } from "../components/EpisodeBlock";
 import { EpisodeBlockSkeleton } from "../components/EpisodeBlockSkeleton";
+import { RatingStars } from "../components/RatingStars";
+import { ReviewsDrawer } from "../components/ReviewsDrawer";
 import { DEFAULT_COVER, LYNN_URL, NICO_URL } from "../constants";
+import { useGetReviewsLazyQuery } from "../hooks/useGetReviewsQuery";
+import { ME_QUERY, useMeQuery } from "../hooks/useMeQuery";
 import {
   getPodcastQuery,
   getPodcastQueryVariables,
   getPodcastQuery_getPodcast_podcast_episodes,
 } from "../__generated__/getPodcastQuery";
+import { meQuery } from "../__generated__/meQuery";
+import {
+  toggleSubscribeMutation,
+  toggleSubscribeMutationVariables,
+} from "../__generated__/toggleSubscribeMutation";
+
+export const TOGGLE_SUBSCRIBE_MUTATION = gql`
+  mutation toggleSubscribeMutation($input: ToggleSubscribeInput!) {
+    toggleSubscribe(input: $input) {
+      ok
+      err
+    }
+  }
+`;
 
 export const GET_PODCAST_QUERY = gql`
-  query getPodcastQuery($input: PodcastSearchInput!) {
+  query getPodcastQuery($input: GetPodcastInput!) {
     getPodcast(input: $input) {
       ok
-      error
+      err
+      currentPage
+      totalPages
+      myRating {
+        rating
+      }
       podcast {
         id
         title
-        category
         description
+        rating
+        subscribersCount
         creator {
-          email
+          username
         }
         episodes {
           id
           title
           createdAt
           description
-        }
-        reviews {
-          title
-          text
         }
       }
     }
@@ -52,10 +76,95 @@ interface IParams {
 export const Podcast = () => {
   const { podcastId } = useParams<IParams>();
   const [order, setOrder] = useState<"ascending" | "descending">("descending");
-  const { data, loading } = useQuery<getPodcastQuery, getPodcastQueryVariables>(
-    GET_PODCAST_QUERY,
-    { variables: { input: { id: +podcastId } } }
+  const [fetchMoreLoading, setFetchMoreLoading] = useState(false);
+  const [isReviewsOpen, setIsReviewsOpen] = useState(true);
+  const { data: userData } = useMeQuery();
+  const didSubscribed = userData?.me.subscriptions.some(
+    (sub) => sub.id === +podcastId
   );
+
+  const onToggleSubscribeMutationCompleted = (
+    data: toggleSubscribeMutation
+  ) => {
+    const {
+      toggleSubscribe: { ok, err },
+    } = data;
+    if (ok && userData?.me) {
+      client.writeQuery<meQuery>({
+        query: ME_QUERY,
+        data: {
+          me: {
+            ...userData.me,
+            subscriptions: userData.me.subscriptions.some(
+              (sub) => sub.id === +podcastId
+            )
+              ? userData.me.subscriptions.filter((sub) => sub.id !== +podcastId)
+              : [
+                  ...userData.me.subscriptions,
+                  { __typename: "Podcast", id: +podcastId },
+                ],
+          },
+        },
+      });
+    } else {
+      console.log(err);
+    }
+  };
+
+  const { loading, data, fetchMore } = useQuery<
+    getPodcastQuery,
+    getPodcastQueryVariables
+  >(GET_PODCAST_QUERY, {
+    variables: { input: { podcastId: +podcastId } },
+  });
+
+  const rating = data?.getPodcast.podcast?.rating;
+
+  const [
+    toggleSubscribeMutation,
+    { loading: toggleSubscribeLoading },
+  ] = useMutation<toggleSubscribeMutation, toggleSubscribeMutationVariables>(
+    TOGGLE_SUBSCRIBE_MUTATION,
+    {
+      onCompleted: onToggleSubscribeMutationCompleted,
+    }
+  );
+
+  const loadMoreEpisodes = async () => {
+    if (data?.getPodcast.currentPage) {
+      setFetchMoreLoading(true);
+      await fetchMore({
+        variables: {
+          input: {
+            podcastId: +podcastId,
+            page: data.getPodcast.currentPage + 1,
+          },
+        },
+        updateQuery: (previouseData, { fetchMoreResult }) => {
+          if (
+            previouseData.getPodcast.podcast &&
+            fetchMoreResult?.getPodcast.podcast
+          ) {
+            return {
+              getPodcast: {
+                ...fetchMoreResult.getPodcast,
+                podcast: {
+                  ...fetchMoreResult?.getPodcast.podcast,
+                  episodes: [
+                    ...previouseData.getPodcast.podcast?.episodes,
+                    ...fetchMoreResult?.getPodcast.podcast?.episodes,
+                  ],
+                },
+              },
+            };
+          } else {
+            return previouseData;
+          }
+        },
+      });
+      setFetchMoreLoading(false);
+    }
+  };
 
   const sortEpisodes = (
     a: getPodcastQuery_getPodcast_podcast_episodes,
@@ -69,7 +178,6 @@ export const Podcast = () => {
     }
     return 0;
   };
-
   return (
     <main className="container">
       <Helmet>
@@ -79,21 +187,51 @@ export const Podcast = () => {
         <div className="flex justify-between mb-3">
           <div>
             {loading ? (
-              <div className="animate-pulse w-48 h-3 bg-gray-200 rounded-full mb-2"></div>
+              <>
+                <div className="animate-pulse w-48 h-3 bg-gray-200 rounded-full mb-2"></div>
+                <div className="animate-pulse w-28 h-3 bg-gray-200 rounded-full mb-2"></div>
+              </>
             ) : (
-              <h2 className="text-xl">{data?.getPodcast.podcast?.title}</h2>
+              <>
+                <div>
+                  <h2 className="text-xl mb-1">
+                    {data?.getPodcast.podcast?.title}
+                  </h2>
+                  <div className="flex items-center">
+                    {rating && <RatingStars rating={rating} />}
+                    <span className="ml-1 text-sm text-gray-500">
+                      {data?.getPodcast.podcast?.rating &&
+                        `(${data.getPodcast.podcast.rating})`}
+                    </span>
+                  </div>
+                </div>
+                <h5 className="text-xs text-gray-600">
+                  {data?.getPodcast.podcast?.creator.username}
+                </h5>
+              </>
             )}
-            {loading ? (
-              <div className="animate-pulse w-32 h-3 bg-gray-200 rounded-full mb-2"></div>
-            ) : (
-              <span className="text-gray-500 block mb-2">
-                {data?.getPodcast.podcast?.creator.email.split("@")[0]}
-              </span>
-            )}
-            <button className="border rounded-full py-1 px-3 text-sm hover:bg-gray-50 active:bg-gray-200 focus:outline-none">
-              <FontAwesomeIcon className="mr-2 text-blue-500" icon={faPlus} />
-              Subscribe
-            </button>
+            <div className="grid grid-cols-2 gap-4">
+              <Button
+                onClick={() => {
+                  toggleSubscribeMutation({
+                    variables: { input: { podcastId: +podcastId } },
+                  });
+                }}
+                active={didSubscribed}
+                disabled={toggleSubscribeLoading}
+                icon={faPlus}
+                activeIcon={faCheck}
+                text="Subscribe"
+                activeText="Subscribed"
+              />
+              <Button
+                onClick={() => {
+                  setIsReviewsOpen(true);
+                }}
+                text="Reviews"
+                icon={faPenNib}
+              />
+            </div>
           </div>
           {loading ? (
             <div className="animate-pulse bg-gray-200 rounded-lg mb-1 w-28 h-28"></div>
@@ -156,6 +294,43 @@ export const Podcast = () => {
                 })}
         </ul>
       </section>
+      <div className="flex justify-center">
+        {data?.getPodcast.currentPage !== data?.getPodcast.totalPages && (
+          <button
+            className={`border rounded-full text-sm text-gray-600 w-28 h-8 focus:outline-none hover:bg-gray-100 active:bg-gray-300 ${
+              fetchMoreLoading && "animate-pulse"
+            }`}
+            onClick={loadMoreEpisodes}
+            disabled={fetchMoreLoading}
+          >
+            {fetchMoreLoading ? (
+              <div className="relative">
+                <span
+                  role="img"
+                  aria-label="heart"
+                  className="absolute animate-ping"
+                >
+                  ❤
+                </span>
+                <span role="img" aria-label="heart">
+                  ❤
+                </span>
+              </div>
+            ) : (
+              <span>Load more</span>
+            )}
+          </button>
+        )}
+      </div>
+      {userData && (
+        <ReviewsDrawer
+          userData={userData}
+          myRating={data?.getPodcast.myRating?.rating}
+          podcastId={+podcastId}
+          isReviewsOpen={isReviewsOpen}
+          setIsReviewsOpen={setIsReviewsOpen}
+        />
+      )}
     </main>
   );
 };

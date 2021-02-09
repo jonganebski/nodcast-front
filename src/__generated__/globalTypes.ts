@@ -7,29 +7,30 @@
 // START Enums and Input Objects
 //==============================================================
 
-export enum Categories {
-  Arts = "Arts",
-  Business = "Business",
-  Comedy = "Comedy",
-  Education = "Education",
-  Flex = "Flex",
-  Health = "Health",
-  NewsAndPolitics = "NewsAndPolitics",
-  SocietyAndCulture = "SocietyAndCulture",
-  SportsAndRecreation = "SportsAndRecreation",
-  TVAndFilm = "TVAndFilm",
-  Technology = "Technology",
-}
-
 export enum UserRole {
   Host = "Host",
   Listener = "Listener",
 }
 
 export interface CreateAccountInput {
-  email?: string | null;
-  password?: string | null;
-  role?: UserRole | null;
+  role: UserRole;
+  email: string;
+  password: string;
+}
+
+export interface CreateReviewInput {
+  podcastId: number;
+  text: string;
+}
+
+export interface GetPodcastInput {
+  page?: number | null;
+  podcastId: number;
+}
+
+export interface GetReviewsInput {
+  page?: number | null;
+  podcastId: number;
 }
 
 export interface LoginInput {
@@ -37,13 +38,13 @@ export interface LoginInput {
   password: string;
 }
 
-export interface PodcastSearchInput {
-  id: number;
-}
-
 export interface SearchPodcastsInput {
   page?: number | null;
   titleQuery: string;
+}
+
+export interface ToggleSubscribeInput {
+  podcastId: number;
 }
 
 //==============================================================

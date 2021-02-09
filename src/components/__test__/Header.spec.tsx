@@ -1,80 +1,111 @@
 import { ApolloProvider } from "@apollo/client";
-import {
-  RenderResult,
-  waitFor,
-  render,
-  act,
-  getByTestId,
-} from "@testing-library/react";
+import { act, render, RenderResult, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createMockClient } from "mock-apollo-client";
+import { BrowserRouter } from "react-router-dom";
 import { SEARCH_PODCASTS_QUERY } from "../../hooks/useSearchPodcastsQuery";
-import { searchPodcastsQueryVariables } from "../../__generated__/searchPodcastsQuery";
+import { Categories } from "../../__generated__/globalTypes";
+import {
+  searchPodcastsQuery,
+  searchPodcastsQuery_searchPodcasts_podcasts,
+} from "../../__generated__/searchPodcastsQuery";
 import { Header } from "../Header";
-import React from "react";
+
+const mockPodcasts: searchPodcastsQuery_searchPodcasts_podcasts[] = [
+  {
+    id: 1,
+    __typename: "Podcast",
+    category: Categories.Arts,
+    rating: 0,
+    title: "Podcast A",
+    updatedAt: "2020-02-02",
+    creator: {
+      __typename: "User",
+      email: "mock@user1.com",
+    },
+  },
+  {
+    id: 2,
+    __typename: "Podcast",
+    category: Categories.Business,
+    rating: 0,
+    title: "Podcast B",
+    updatedAt: "2020-02-02",
+    creator: {
+      __typename: "User",
+      email: "mock@user2.com",
+    },
+  },
+];
+
+const MOCK_SEARCHTERM = "mock007";
+
+const mockPush = jest.fn();
+
+jest.mock("react-router-dom", () => {
+  const realModule = jest.requireActual("react-router-dom");
+  return {
+    ...realModule,
+    useHistory: () => {
+      return { push: mockPush };
+    },
+  };
+});
 
 describe("<Header />", () => {
   let renderResult: RenderResult;
-  let mockedClient = createMockClient();
+  const mockClient = createMockClient();
+
+  beforeAll(async () => {
+    await waitFor(() => {
+      mockClient.setRequestHandler(SEARCH_PODCASTS_QUERY, () =>
+        Promise.resolve({
+          data: {
+            searchPodcasts: { podcasts: mockPodcasts },
+          } as searchPodcastsQuery,
+        })
+      );
+    });
+  });
 
   beforeEach(async () => {
     await waitFor(() => {
       renderResult = render(
-        <ApolloProvider client={mockedClient}>
-          <Header />
+        <ApolloProvider client={mockClient}>
+          <BrowserRouter>
+            <Header />
+          </BrowserRouter>
         </ApolloProvider>
       );
     });
   });
 
-  it("should render OK", async () => {
+  it("should render OK", () => {
     const { getByPlaceholderText } = renderResult;
-    await waitFor(() => {
-      getByPlaceholderText(/search podcast/i);
-    });
+    getByPlaceholderText(/Search podcast/i);
   });
 
-  it("should call search query on input", async () => {
-    const { getByPlaceholderText, getByText } = renderResult;
-    const searchInputElement = getByPlaceholderText(/search podcast/i);
-
-    const mockedQueryResponse = jest.fn().mockResolvedValue({
-      data: {
-        searchPodcasts: {
-          ok: true,
-          podcasts: [
-            {
-              id: 1,
-              title: "Mock Podcast",
-              creator: { email: "agent@mock.com" },
-            },
-          ],
-        },
-      },
-    });
-
-    mockedClient.setRequestHandler(SEARCH_PODCASTS_QUERY, mockedQueryResponse);
-    await waitFor(async () => {
-      userEvent.paste(searchInputElement, "Mock");
-    });
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+  it("should show search results and hide results on body click", async () => {
+    jest.useFakeTimers();
+    const { getByPlaceholderText, container } = renderResult;
+    const searchInput = getByPlaceholderText(/Search podcast/i);
     await waitFor(() => {
-      expect(mockedQueryResponse).toHaveBeenCalledTimes(1);
-      expect(mockedQueryResponse).toHaveBeenCalledWith({
-        input: { titleQuery: "Mock", page: 1 },
-      } as searchPodcastsQueryVariables);
-      getByText("Mock");
+      userEvent.click(searchInput);
+      userEvent.paste(searchInput, MOCK_SEARCHTERM);
     });
+    act(() => {
+      jest.advanceTimersByTime(1500);
+    });
+    await waitFor(() => {
+      expect(container.querySelector("ul")).toBeVisible();
+    });
+    await waitFor(() => {
+      userEvent.click(document.body);
+    });
+    expect(container.querySelector("ul")).toBeNull();
   });
 
-  //   it("should push to the podcast's page", async () => {
-  //     const { getByPlaceholderText } = renderResult;
-  //     const searchInputElement = getByPlaceholderText(/search podcast/i);
-  //     const body = await waitFor(async () => {
-  //       userEvent.paste(searchInputElement, "Mock");
-  //     });
-  //     await new Promise((resolve) => setTimeout(resolve, 2000));
-  //   });
-  it.todo("should hide search results on click body");
-  it.todo("should show search results on click input");
+  afterAll(() => {
+    jest.clearAllMocks();
+  });
 });

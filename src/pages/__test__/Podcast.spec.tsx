@@ -1,7 +1,10 @@
 import { ApolloProvider } from "@apollo/client";
 import { render, RenderResult, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { createMockClient } from "mock-apollo-client";
+import React from "react";
 import { HelmetProvider } from "react-helmet-async";
+import { BrowserRouter } from "react-router-dom";
 import { getPodcastQuery_getPodcast_podcast } from "../../__generated__/getPodcastQuery";
 import { Categories } from "../../__generated__/globalTypes";
 import { GET_PODCAST_QUERY, Podcast } from "../Podcast";
@@ -30,17 +33,43 @@ const MOCK_PODCAST: getPodcastQuery_getPodcast_podcast = {
   ],
 };
 
+jest.mock("react-router-dom", () => {
+  const realModule = jest.requireActual("react-router-dom");
+  return {
+    ...realModule,
+    useParams: () => jest.fn().mockReturnValue({ podcastId: 1 }),
+  };
+});
+
 describe("<Podcast />", () => {
   let renderResult: RenderResult;
-  let mockedClient = createMockClient();
+  let mockClient = createMockClient();
+
+  beforeAll(async () => {
+    await waitFor(() => {
+      mockClient.setRequestHandler(GET_PODCAST_QUERY, () =>
+        Promise.resolve({
+          data: {
+            getPodcast: {
+              ok: true,
+              error: "Query error",
+              podcast: MOCK_PODCAST,
+            },
+          },
+        })
+      );
+    });
+  });
 
   beforeEach(async () => {
     await waitFor(() => {
       renderResult = render(
-        <ApolloProvider client={mockedClient}>
-          <HelmetProvider>
-            <Podcast />
-          </HelmetProvider>
+        <ApolloProvider client={mockClient}>
+          <BrowserRouter>
+            <HelmetProvider>
+              <Podcast />
+            </HelmetProvider>
+          </BrowserRouter>
         </ApolloProvider>
       );
     });
@@ -52,26 +81,23 @@ describe("<Podcast />", () => {
     });
   });
 
-  it("should call getPodcast query", async () => {
+  it("render OK with getPodcast query", async () => {
     const { getByText } = renderResult;
-    const mockQueryResponse = jest.fn().mockResolvedValue({
-      data: {
-        getPodcast: {
-          ok: true,
-          error: "Query error",
-          podcasts: [MOCK_PODCAST],
-        },
-      },
-    });
-    mockedClient.setRequestHandler(GET_PODCAST_QUERY, mockQueryResponse);
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    getByText(MOCK_PODCAST.title);
+    getByText(MOCK_PODCAST.creator.email.split("@")[0]);
+    getByText(MOCK_PODCAST.description);
+    let sortBtn = getByText("Newest first");
     await waitFor(() => {
-      expect(mockQueryResponse).toHaveBeenCalledTimes(1);
-      getByText(MOCK_PODCAST.title);
-      getByText(MOCK_PODCAST.creator.email.split("@")[0]);
-      getByText("Subscribe");
-      getByText(MOCK_PODCAST.description);
-      getByText("Available episodes");
+      userEvent.click(sortBtn);
     });
+    sortBtn = getByText("Oldest first");
+    await waitFor(() => {
+      userEvent.click(sortBtn);
+    });
+    getByText("Newest first");
+  });
+
+  afterAll(() => {
+    jest.clearAllMocks();
   });
 });

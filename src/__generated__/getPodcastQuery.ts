@@ -3,15 +3,20 @@
 // @generated
 // This file was automatically generated and should not be edited.
 
-import { PodcastSearchInput, Categories } from "./globalTypes";
+import { GetPodcastInput } from "./globalTypes";
 
 // ====================================================
 // GraphQL query operation: getPodcastQuery
 // ====================================================
 
+export interface getPodcastQuery_getPodcast_myRating {
+  __typename: "Rating";
+  rating: number;
+}
+
 export interface getPodcastQuery_getPodcast_podcast_creator {
-  __typename: "User";
-  email: string;
+  __typename: "Users";
+  username: string | null;
 }
 
 export interface getPodcastQuery_getPodcast_podcast_episodes {
@@ -19,30 +24,27 @@ export interface getPodcastQuery_getPodcast_podcast_episodes {
   id: number;
   title: string;
   createdAt: any;
-  description: string | null;
-}
-
-export interface getPodcastQuery_getPodcast_podcast_reviews {
-  __typename: "Review";
-  title: string;
-  text: string;
+  description: string;
 }
 
 export interface getPodcastQuery_getPodcast_podcast {
   __typename: "Podcast";
   id: number;
   title: string;
-  category: Categories;
   description: string;
+  rating: number | null;
+  subscribersCount: number;
   creator: getPodcastQuery_getPodcast_podcast_creator;
   episodes: getPodcastQuery_getPodcast_podcast_episodes[];
-  reviews: getPodcastQuery_getPodcast_podcast_reviews[];
 }
 
 export interface getPodcastQuery_getPodcast {
-  __typename: "PodcastOutput";
+  __typename: "GetPodcastOutput";
   ok: boolean;
-  error: string | null;
+  err: string | null;
+  currentPage: number | null;
+  totalPages: number | null;
+  myRating: getPodcastQuery_getPodcast_myRating | null;
   podcast: getPodcastQuery_getPodcast_podcast | null;
 }
 
@@ -51,5 +53,5 @@ export interface getPodcastQuery {
 }
 
 export interface getPodcastQueryVariables {
-  input: PodcastSearchInput;
+  input: GetPodcastInput;
 }

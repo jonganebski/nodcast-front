@@ -1,70 +1,61 @@
 import { gql, useQuery } from "@apollo/client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Helmet } from "react-helmet-async";
-import { PodcastBlock } from "../components/PodcastBlock";
+import { CategorySection } from "../components/CategorySection";
 import { PodcastBlockSkeleton } from "../components/PodcastBlockSkeleton";
-import { getAllPodcastsQuery } from "../__generated__/getAllPodcastsQuery";
+import { getCategoriesQueryListner } from "../__generated__/getCategoriesQueryListner";
 
-const GET_ALL_PODCASTS_QUERY = gql`
-  query getAllPodcastsQuery {
-    getAllPodcasts {
-      error
+export const GET_CATEGORIES_QUERY_LISTENER = gql`
+  query getCategoriesQueryListner {
+    getCategories {
       ok
-      podcasts {
+      err
+      categories {
         id
-        title
-        category
-        rating
-        updatedAt
+        name
+        podcasts {
+          id
+          title
+          subscribersCount
+          description
+          updatedAt
+        }
       }
     }
   }
 `;
 
 export const Home = () => {
-  const { data, loading } = useQuery<getAllPodcastsQuery>(
-    GET_ALL_PODCASTS_QUERY
+  const { data, loading } = useQuery<getCategoriesQueryListner>(
+    GET_CATEGORIES_QUERY_LISTENER
   );
-  const [categories, setCategories] = useState<string[]>(["", "", ""]);
-
-  useEffect(() => {
-    const categories = data?.getAllPodcasts.podcasts?.reduce((acc, value) => {
-      acc.add(value.category);
-      return acc;
-    }, new Set<string>());
-    if (categories) {
-      setCategories(Array.from(categories));
-    }
-  }, [data?.getAllPodcasts.podcasts]);
-
+  console.log(loading);
+  console.log(data);
   return (
     <main className="container grid gap-10">
       <Helmet>
         <title>Home | Nodcast</title>
       </Helmet>
-      {categories.map((categoryName, i) => {
-        return loading ? (
-          <section className="animate-pulse" key={i}>
-            <div className="w-16 h-4 bg-gray-200 rounded-full mb-2"></div>
-            <ul className="grid grid-cols-5 gap-4">
-              {[1, 2, 3, 4].map((_, i) => {
-                return <PodcastBlockSkeleton key={i} />;
-              })}
-            </ul>
-          </section>
-        ) : (
-          <section key={i}>
-            <h3 className="text-lg mb-2">{categoryName}</h3>
-            <ul className="grid grid-cols-5 gap-4">
-              {data?.getAllPodcasts.podcasts
-                ?.filter((podcast) => podcast.category === categoryName)
-                .map((podcast) => {
-                  return <PodcastBlock podcast={podcast} key={podcast.id} />;
-                })}
-            </ul>
-          </section>
-        );
-      })}
+      {loading
+        ? Array(5)
+            .fill(0)
+            .map((_, i) => (
+              <section className="animate-pulse" key={i}>
+                <div className="w-16 h-4 bg-gray-200 rounded-full mb-2"></div>
+                <ul className="grid grid-cols-5 gap-4">
+                  {[1, 2, 3, 4, 5].map((_, i) => {
+                    return <PodcastBlockSkeleton key={i} />;
+                  })}
+                </ul>
+              </section>
+            ))
+        : data?.getCategories.categories?.map((category) => {
+            if (category.podcasts.length !== 0) {
+              return <CategorySection category={category} key={category.id} />;
+            } else {
+              return null;
+            }
+          })}
     </main>
   );
 };

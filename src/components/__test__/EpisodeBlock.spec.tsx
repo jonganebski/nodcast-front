@@ -2,7 +2,6 @@ import { render } from "@testing-library/react";
 import React from "react";
 import { computeTimelapse } from "../../helpers";
 import { getPodcastQuery_getPodcast_podcast_episodes } from "../../__generated__/getPodcastQuery";
-import { Categories } from "../../__generated__/globalTypes";
 import { EpisodeBlock } from "../EpisodeBlock";
 
 const MOCK_EPISODE: getPodcastQuery_getPodcast_podcast_episodes = {

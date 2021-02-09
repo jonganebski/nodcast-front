@@ -8,18 +8,12 @@ export const SEARCH_PODCASTS_QUERY = gql`
   query searchPodcastsQuery($input: SearchPodcastsInput!) {
     searchPodcasts(input: $input) {
       ok
-      error
-      totalPages
-      totalCount
+      err
       podcasts {
         id
         title
-        category
         rating
         updatedAt
-        creator {
-          email
-        }
       }
     }
   }

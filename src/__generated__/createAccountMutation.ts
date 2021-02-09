@@ -12,7 +12,7 @@ import { CreateAccountInput } from "./globalTypes";
 export interface createAccountMutation_createAccount {
   __typename: "CreateAccountOutput";
   ok: boolean;
-  error: string | null;
+  err: string | null;
 }
 
 export interface createAccountMutation {
