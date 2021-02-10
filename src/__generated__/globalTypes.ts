@@ -19,6 +19,12 @@ export interface CreateAccountInput {
   password: string;
 }
 
+export interface CreatePodcastInput {
+  title: string;
+  description?: string | null;
+  categoryIds?: number[] | null;
+}
+
 export interface CreateReviewInput {
   podcastId: number;
   text: string;
@@ -41,7 +47,7 @@ export interface GetEpisodeInput {
 
 export interface GetPodcastInput {
   page?: number | null;
-  podcastId: number;
+  podcastId?: number | null;
 }
 
 export interface GetReviewsInput {

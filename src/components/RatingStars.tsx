@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import { client } from "../apollo";
 import { MAX_RATING } from "../constants";
-import { GET_PODCAST_QUERY } from "../pages/Podcast";
+import { GET_PODCAST_QUERY } from "../hooks/useGetPodcastQuery";
 import {
   getPodcastQuery,
   getPodcastQueryVariables,

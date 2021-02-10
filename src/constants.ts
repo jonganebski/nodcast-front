@@ -47,3 +47,11 @@ export const AUTH_FORM = {
 export const REVIEW_MAX_LENGTH = 1000;
 
 export const MAX_RATING = 5;
+
+export const PODCAST_FORM = {
+  TITLE_REQUIRED_ERR: "Title is required",
+  TITLE_MAX_LENGTH: 50,
+  TITLE_MAX_LENGTH_ERR: "Title is too long",
+  PODCAST_DESC_MAX_LENGTH: 1000,
+  PODCAST_DESC_MAX_LENGTH_ERR: `Description is too long`,
+};

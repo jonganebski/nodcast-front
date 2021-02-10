@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
+import { isLoggedInVar } from "../apollo";
 import { TOKEN_NAME } from "../constants";
 import { useSearchPodcastsQuery } from "../hooks/useSearchPodcastsQuery";
+import { UserRole } from "../__generated__/globalTypes";
 import { meQuery_me } from "../__generated__/meQuery";
 import { EditProfileModal } from "./EditProfileModal";
 
@@ -103,18 +105,22 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
         <span className="text-white">{me?.email[0].toUpperCase()}</span>
         {isUserPopup && me && (
           <ul className="absolute grid gap-px bg-gray-300 top-12 right-0 border rounded-md shadow-lg whitespace-nowrap overflow-hidden text-sm">
-            <li
-              className="px-10 py-3 bg-white hover:bg-gray-100"
-              onClick={() => history.push("/feeds")}
-            >
-              My feed
-            </li>
-            <li
-              className="px-10 py-3 bg-white hover:bg-gray-100"
-              onClick={() => history.push("/subscriptions")}
-            >
-              Subscriptions
-            </li>
+            {me.role === UserRole.Listener && (
+              <li
+                className="px-10 py-3 bg-white hover:bg-gray-100"
+                onClick={() => history.push("/feeds")}
+              >
+                My feed
+              </li>
+            )}
+            {me.role === UserRole.Listener && (
+              <li
+                className="px-10 py-3 bg-white hover:bg-gray-100"
+                onClick={() => history.push("/subscriptions")}
+              >
+                Subscriptions
+              </li>
+            )}
             <li
               className="px-10 py-3 bg-white hover:bg-gray-100"
               onClick={() => setIsEditProfileOpen(true)}
@@ -125,6 +131,7 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
               className="px-10 py-3 bg-white hover:bg-gray-100"
               onClick={() => {
                 localStorage.removeItem(TOKEN_NAME);
+                isLoggedInVar(false);
                 history.go(0);
               }}
             >

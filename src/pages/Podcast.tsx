@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
   faCheck,
   faPenNib,
@@ -17,15 +17,9 @@ import { EpisodeBlockSkeleton } from "../components/EpisodeBlockSkeleton";
 import { PodcastCover } from "../components/PodcastCover";
 import { RatingStars } from "../components/RatingStars";
 import { ReviewsDrawer } from "../components/ReviewsDrawer";
-import { DEFAULT_COVER, LYNN_URL, NICO_URL } from "../constants";
-import { EPISODE_FRAGMENT } from "../fragments";
-import { useGetReviewsLazyQuery } from "../hooks/useGetReviewsQuery";
+import { useGetPodcastQuery } from "../hooks/useGetPodcastQuery";
 import { ME_QUERY, useMeQuery } from "../hooks/useMeQuery";
-import {
-  getPodcastQuery,
-  getPodcastQueryVariables,
-  getPodcastQuery_getPodcast_podcast_episodes,
-} from "../__generated__/getPodcastQuery";
+import { getPodcastQuery_getPodcast_podcast_episodes } from "../__generated__/getPodcastQuery";
 import { meQuery } from "../__generated__/meQuery";
 import {
   toggleSubscribeMutation,
@@ -39,35 +33,6 @@ export const TOGGLE_SUBSCRIBE_MUTATION = gql`
       err
     }
   }
-`;
-
-export const GET_PODCAST_QUERY = gql`
-  query getPodcastQuery($input: GetPodcastInput!) {
-    getPodcast(input: $input) {
-      ok
-      err
-      currentPage
-      totalPages
-      myRating {
-        rating
-      }
-      podcast {
-        id
-        title
-        description
-        rating
-        subscribersCount
-        creator {
-          id
-          username
-        }
-        episodes {
-          ...EpisodeParts
-        }
-      }
-    }
-  }
-  ${EPISODE_FRAGMENT}
 `;
 
 interface IParams {
@@ -112,12 +77,7 @@ export const Podcast = () => {
     }
   };
 
-  const { loading, data, fetchMore } = useQuery<
-    getPodcastQuery,
-    getPodcastQueryVariables
-  >(GET_PODCAST_QUERY, {
-    variables: { input: { podcastId: +podcastId } },
-  });
+  const { data, loading, fetchMore } = useGetPodcastQuery(+podcastId);
 
   const rating = data?.getPodcast.podcast?.rating;
 
@@ -207,7 +167,7 @@ export const Podcast = () => {
                   </div>
                 </div>
                 <h5 className="text-xs text-gray-600">
-                  {data?.getPodcast.podcast?.creator.username}
+                  {data?.getPodcast.podcast?.creator?.username}
                 </h5>
               </>
             )}
@@ -310,7 +270,7 @@ export const Podcast = () => {
           />
         )}
       </div>
-      {userData && data?.getPodcast.podcast?.creator.id && (
+      {userData && data?.getPodcast.podcast?.creator?.id && (
         <ReviewsDrawer
           userData={userData}
           podcastId={+podcastId}
