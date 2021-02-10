@@ -9,21 +9,18 @@ import { GetReviewsInput } from "./globalTypes";
 // GraphQL query operation: getReviewsQuery
 // ====================================================
 
-export interface getReviewsQuery_getReviews_reviews_creator_ratings {
-  __typename: "Rating";
-  rating: number;
-}
-
 export interface getReviewsQuery_getReviews_reviews_creator {
   __typename: "Users";
-  username: string | null;
-  ratings: getReviewsQuery_getReviews_reviews_creator_ratings[];
+  id: number;
+  username: string;
 }
 
 export interface getReviewsQuery_getReviews_reviews {
   __typename: "Review";
   id: number;
   text: string;
+  createdAt: any;
+  updatedAt: any;
   creator: getReviewsQuery_getReviews_reviews_creator;
 }
 

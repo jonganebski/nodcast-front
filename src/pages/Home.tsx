@@ -3,6 +3,7 @@ import React from "react";
 import { Helmet } from "react-helmet-async";
 import { CategorySection } from "../components/CategorySection";
 import { PodcastBlockSkeleton } from "../components/PodcastBlockSkeleton";
+import { PODCAST_FRAGMENT } from "../fragments";
 import { getCategoriesQueryListner } from "../__generated__/getCategoriesQueryListner";
 
 export const GET_CATEGORIES_QUERY_LISTENER = gql`
@@ -14,15 +15,12 @@ export const GET_CATEGORIES_QUERY_LISTENER = gql`
         id
         name
         podcasts {
-          id
-          title
-          subscribersCount
-          description
-          updatedAt
+          ...PodcastParts
         }
       }
     }
   }
+  ${PODCAST_FRAGMENT}
 `;
 
 export const Home = () => {

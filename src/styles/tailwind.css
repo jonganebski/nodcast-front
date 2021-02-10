@@ -9,6 +9,10 @@
   @apply absolute top-10 z-10 border rounded-full w-10 h-10 text-xs bg-white text-gray-400 shadow-md hover:bg-gray-100 hover:text-gray-500 focus:outline-none;
 }
 
+.review-textarea {
+  @apply w-full h-28 border rounded-md resize-none p-3 text-sm focus:outline-none focus:border-gray-400;
+}
+
 @tailwind utilities;
 
 @layer utilities {
@@ -23,7 +27,7 @@
     position: absolute;
     left: 2px;
     width: 4px;
-    background: #fff;
+    background: black;
     animation: loading-indicator 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
   }
   .loading-indicator div:nth-child(1) {

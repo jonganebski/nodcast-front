@@ -15,12 +15,28 @@ export enum UserRole {
 export interface CreateAccountInput {
   role: UserRole;
   email: string;
+  username: string;
   password: string;
 }
 
 export interface CreateReviewInput {
   podcastId: number;
   text: string;
+}
+
+export interface EditProfileInput {
+  email: string;
+  username: string;
+  password?: string | null;
+}
+
+export interface EditReviewInput {
+  reviewId: number;
+  text: string;
+}
+
+export interface GetEpisodeInput {
+  episodeId: number;
 }
 
 export interface GetPodcastInput {
@@ -36,6 +52,11 @@ export interface GetReviewsInput {
 export interface LoginInput {
   email: string;
   password: string;
+}
+
+export interface SaveRatingInput {
+  podcastId: number;
+  rating: number;
 }
 
 export interface SearchPodcastsInput {

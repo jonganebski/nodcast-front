@@ -14,9 +14,11 @@ import { client } from "../apollo";
 import { Button } from "../components/Button";
 import { EpisodeBlock } from "../components/EpisodeBlock";
 import { EpisodeBlockSkeleton } from "../components/EpisodeBlockSkeleton";
+import { PodcastCover } from "../components/PodcastCover";
 import { RatingStars } from "../components/RatingStars";
 import { ReviewsDrawer } from "../components/ReviewsDrawer";
 import { DEFAULT_COVER, LYNN_URL, NICO_URL } from "../constants";
+import { EPISODE_FRAGMENT } from "../fragments";
 import { useGetReviewsLazyQuery } from "../hooks/useGetReviewsQuery";
 import { ME_QUERY, useMeQuery } from "../hooks/useMeQuery";
 import {
@@ -56,17 +58,16 @@ export const GET_PODCAST_QUERY = gql`
         rating
         subscribersCount
         creator {
+          id
           username
         }
         episodes {
-          id
-          title
-          createdAt
-          description
+          ...EpisodeParts
         }
       }
     }
   }
+  ${EPISODE_FRAGMENT}
 `;
 
 interface IParams {
@@ -77,7 +78,7 @@ export const Podcast = () => {
   const { podcastId } = useParams<IParams>();
   const [order, setOrder] = useState<"ascending" | "descending">("descending");
   const [fetchMoreLoading, setFetchMoreLoading] = useState(false);
-  const [isReviewsOpen, setIsReviewsOpen] = useState(true);
+  const [isReviewsOpen, setIsReviewsOpen] = useState(false);
   const { data: userData } = useMeQuery();
   const didSubscribed = userData?.me.subscriptions.some(
     (sub) => sub.id === +podcastId
@@ -183,7 +184,7 @@ export const Podcast = () => {
       <Helmet>
         <title>Podcast | Nodcast</title>
       </Helmet>
-      <section className="mb-4">
+      <section className="mb-8">
         <div className="flex justify-between mb-3">
           <div>
             {loading ? (
@@ -210,7 +211,7 @@ export const Podcast = () => {
                 </h5>
               </>
             )}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-x-4 mb-2 items-center">
               <Button
                 onClick={() => {
                   toggleSubscribeMutation({
@@ -232,20 +233,25 @@ export const Podcast = () => {
                 icon={faPenNib}
               />
             </div>
+            {data?.getPodcast.myRating?.rating && (
+              <div className="border rounded-full py-1 px-3 text-sm focus:outline-none font-semibold flex items-center">
+                <span className="text-sm text-gray-600 mr-2">
+                  Rate this podcast:
+                </span>
+                <RatingStars
+                  rating={data?.getPodcast.myRating?.rating}
+                  isEditMode={true}
+                  podcast={data.getPodcast.podcast}
+                />
+              </div>
+            )}
           </div>
           {loading ? (
             <div className="animate-pulse bg-gray-200 rounded-lg mb-1 w-28 h-28"></div>
           ) : (
-            <img
-              className="object-cover rounded-lg mb-1 w-28 h-28"
-              src={
-                data?.getPodcast.podcast?.id === 1
-                  ? NICO_URL
-                  : data?.getPodcast.podcast?.id === 3
-                  ? LYNN_URL
-                  : DEFAULT_COVER
-              }
-              alt="podcast-cover"
+            <PodcastCover
+              coverUrl=""
+              title={data?.getPodcast.podcast?.title ?? ""}
             />
           )}
         </div>
@@ -296,37 +302,19 @@ export const Podcast = () => {
       </section>
       <div className="flex justify-center">
         {data?.getPodcast.currentPage !== data?.getPodcast.totalPages && (
-          <button
-            className={`border rounded-full text-sm text-gray-600 w-28 h-8 focus:outline-none hover:bg-gray-100 active:bg-gray-300 ${
-              fetchMoreLoading && "animate-pulse"
-            }`}
-            onClick={loadMoreEpisodes}
+          <Button
+            text="Load more"
             disabled={fetchMoreLoading}
-          >
-            {fetchMoreLoading ? (
-              <div className="relative">
-                <span
-                  role="img"
-                  aria-label="heart"
-                  className="absolute animate-ping"
-                >
-                  ❤
-                </span>
-                <span role="img" aria-label="heart">
-                  ❤
-                </span>
-              </div>
-            ) : (
-              <span>Load more</span>
-            )}
-          </button>
+            loading={fetchMoreLoading}
+            onClick={loadMoreEpisodes}
+          />
         )}
       </div>
-      {userData && (
+      {userData && data?.getPodcast.podcast?.creator.id && (
         <ReviewsDrawer
           userData={userData}
-          myRating={data?.getPodcast.myRating?.rating}
           podcastId={+podcastId}
+          podcastCreatorId={data?.getPodcast.podcast?.creator.id}
           isReviewsOpen={isReviewsOpen}
           setIsReviewsOpen={setIsReviewsOpen}
         />

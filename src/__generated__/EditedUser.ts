@@ -6,23 +6,19 @@
 import { UserRole } from "./globalTypes";
 
 // ====================================================
-// GraphQL query operation: meQuery
+// GraphQL fragment: EditedUser
 // ====================================================
 
-export interface meQuery_me_subscriptions {
+export interface EditedUser_subscriptions {
   __typename: "Podcast";
   id: number;
 }
 
-export interface meQuery_me {
+export interface EditedUser {
   __typename: "Users";
   id: number;
   email: string;
   username: string;
   role: UserRole;
-  subscriptions: meQuery_me_subscriptions[];
-}
-
-export interface meQuery {
-  me: meQuery_me;
+  subscriptions: EditedUser_subscriptions[];
 }

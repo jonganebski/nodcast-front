@@ -2,7 +2,7 @@ import { gql, useMutation } from "@apollo/client";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { client } from "../apollo";
 import {
   GET_REVIEWS_QUERY,
@@ -20,11 +20,12 @@ import {
 import { meQuery } from "../__generated__/meQuery";
 import { Button } from "./Button";
 import { ReviewBlock } from "./ReviewBlock";
+import { ReviewForm } from "./ReviewForm";
 
 interface IReviewsDrawerProps {
   userData: meQuery;
-  myRating: number | undefined;
   podcastId: number;
+  podcastCreatorId: number;
   isReviewsOpen: boolean;
   setIsReviewsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -43,32 +44,20 @@ const CREATE_REVIEW_MUTATION = gql`
   }
 `;
 
-const REVIEW_MAX_LENGTH = 1000;
-
 export const ReviewsDrawer: React.FC<IReviewsDrawerProps> = ({
   userData,
-  myRating,
   podcastId,
+  podcastCreatorId,
   isReviewsOpen,
   setIsReviewsOpen,
 }) => {
   const [fetchMoreLoading, setFetchMoreLoading] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    getValues,
-    errors,
-    formState,
-    setValue,
-    watch,
-  } = useForm<IFormProps>({ mode: "onChange" });
+  const f = useForm<IFormProps>({ mode: "onChange" });
 
   const [
     getReviewsLazyQuery,
     { data: reviewData, loading, fetchMore },
   ] = useGetReviewsLazyQuery(podcastId);
-
-  console.log(reviewData);
 
   useEffect(() => {
     if (isReviewsOpen) {
@@ -94,16 +83,15 @@ export const ReviewsDrawer: React.FC<IReviewsDrawerProps> = ({
         const newReview: getReviewsQuery_getReviews_reviews = {
           __typename: "Review",
           id,
-          text: getValues().text,
+          text: f.getValues().text,
+          createdAt: new Date(),
+          updatedAt: new Date(),
           creator: {
             __typename: "Users",
+            id: userData.me.id,
             username: userData.me.username,
-            ratings: myRating
-              ? [{ __typename: "Rating", rating: myRating }]
-              : [],
           },
         };
-        console.log(previousQuery.getReviews.reviews);
         client.writeQuery<getReviewsQuery, getReviewsQueryVariables>({
           query: GET_REVIEWS_QUERY,
           variables: {
@@ -136,9 +124,9 @@ export const ReviewsDrawer: React.FC<IReviewsDrawerProps> = ({
   >(CREATE_REVIEW_MUTATION, { onCompleted });
 
   const onSubmit = async () => {
-    const { text } = getValues();
+    const { text } = f.getValues();
     await createReviewMutation({ variables: { input: { podcastId, text } } });
-    setValue("text", "", { shouldValidate: true });
+    f.setValue("text", "", { shouldValidate: true });
   };
 
   const fetchMoreReviews = async () => {
@@ -185,43 +173,30 @@ export const ReviewsDrawer: React.FC<IReviewsDrawerProps> = ({
         }}
       />
       <section
-        className={`fixed top-0 w-96 h-screen p-5 overflow-y-scroll bg-white shadow-xl transition-all duration-700 ${
+        className={`fixed z-20 top-0 w-96 h-screen p-5 overflow-y-scroll bg-white shadow-xl transition-all duration-700 ${
           isReviewsOpen ? "left-0" : "-left-96"
         }`}
       >
-        <h3 className="font-semibold text-lg">Reviews</h3>
+        <h3 className="font-semibold text-lg mr-2">Reviews</h3>
         <FontAwesomeIcon
           className="absolute top-4 right-4 cursor-pointer text-gray-400 hover:text-gray-600"
           onClick={() => setIsReviewsOpen(false)}
           icon={faTimes}
         />
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex justify-end mb-1">
-            <span
-              className={`text-sm ${
-                errors.text?.type === "maxLength"
-                  ? "text-red-500"
-                  : "text-gray-600"
-              }`}
-            >{`(${watch().text?.length}/${REVIEW_MAX_LENGTH})`}</span>
-          </div>
-          <textarea
-            className="w-full h-28 border rounded-md resize-none p-3 text-sm focus:outline-none focus:border-gray-400"
-            ref={register({ required: true, maxLength: REVIEW_MAX_LENGTH })}
-            name="text"
-          />
-          <div className="flex justify-end">
-            <Button
-              disabled={!formState.isValid || createReviewLoading}
-              loading={createReviewLoading}
-              text="Submit"
-            />
-          </div>
-        </form>
+        <FormProvider {...f}>
+          <ReviewForm submitLoading={createReviewLoading} onSubmit={onSubmit} />
+        </FormProvider>
         {loading ? null : (
           <ul className="grid gap-px bg-gray-200">
             {reviewData?.getReviews.reviews?.map((review) => {
-              return <ReviewBlock review={review} key={review.id} />;
+              return (
+                <ReviewBlock
+                  review={review}
+                  userData={userData}
+                  podcastCreatorId={podcastCreatorId}
+                  key={review.id}
+                />
+              );
             })}
           </ul>
         )}

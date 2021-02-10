@@ -34,9 +34,16 @@ const PASS_MIN_LENGTH = 6;
 export const AUTH_FORM = {
   EMAIL_INVALID_ERR: "Invalid email",
   EMAIL_REQUIRED_ERR: "Email field is required",
+  USERNAME_MAX_LENGTH: 50,
+  USERNAME_MAX_LENGTH_ERR: "Username is too long",
+  USERNAME_REQUIRED_ERR: "Username is required",
   PASS_REQUIRED_ERR: "Password field is required",
   PASS_MIN_LENGTH,
   PASS_MIN_LENGTH_ERR: `Minimum password length is ${PASS_MIN_LENGTH}`,
   CHECK_PASS_INVALID_ERR: "Passwords does not match",
   CHECK_PASS_REQUIRED_ERR: "Check password field is required",
 };
+
+export const REVIEW_MAX_LENGTH = 1000;
+
+export const MAX_RATING = 5;

@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { TOKEN_NAME } from "../constants";
 import { useSearchPodcastsQuery } from "../hooks/useSearchPodcastsQuery";
 import { meQuery_me } from "../__generated__/meQuery";
+import { EditProfileModal } from "./EditProfileModal";
 
 interface IHeaderProps {
   me: meQuery_me | undefined;
@@ -11,6 +12,7 @@ interface IHeaderProps {
 export const Header: React.FC<IHeaderProps> = ({ me }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const timeoutIdRef = useRef<any>();
   const ulRef = useRef<HTMLUListElement | null>(null);
   const [isUserPopup, setIsUserPopup] = useState(false);
@@ -70,7 +72,7 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
         />
         {showSearchResults && (
           <ul
-            className="grid absolute border rounded-b-md overflow-hidden w-full gap-px bg-gray-200 shadow-md"
+            className="grid absolute z-10 border rounded-b-md overflow-hidden w-full gap-px bg-gray-200 shadow-md"
             ref={ulRef}
           >
             {data?.searchPodcasts.podcasts?.map((podcast) => {
@@ -101,11 +103,22 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
         <span className="text-white">{me?.email[0].toUpperCase()}</span>
         {isUserPopup && me && (
           <ul className="absolute grid gap-px bg-gray-300 top-12 right-0 border rounded-md shadow-lg whitespace-nowrap overflow-hidden text-sm">
-            <li className="px-10 py-3 bg-white hover:bg-gray-100">My feed</li>
-            <li className="px-10 py-3 bg-white hover:bg-gray-100">
+            <li
+              className="px-10 py-3 bg-white hover:bg-gray-100"
+              onClick={() => history.push("/feeds")}
+            >
+              My feed
+            </li>
+            <li
+              className="px-10 py-3 bg-white hover:bg-gray-100"
+              onClick={() => history.push("/subscriptions")}
+            >
               Subscriptions
             </li>
-            <li className="px-10 py-3 bg-white hover:bg-gray-100">
+            <li
+              className="px-10 py-3 bg-white hover:bg-gray-100"
+              onClick={() => setIsEditProfileOpen(true)}
+            >
               Edit profile
             </li>
             <li
@@ -120,6 +133,13 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
           </ul>
         )}
       </div>
+      {me && (
+        <EditProfileModal
+          isEditProfileOpen={isEditProfileOpen}
+          setIsEditProfileOpen={setIsEditProfileOpen}
+          me={me}
+        />
+      )}
     </header>
   );
 };

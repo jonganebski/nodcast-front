@@ -16,7 +16,8 @@ export interface getPodcastQuery_getPodcast_myRating {
 
 export interface getPodcastQuery_getPodcast_podcast_creator {
   __typename: "Users";
-  username: string | null;
+  id: number;
+  username: string;
 }
 
 export interface getPodcastQuery_getPodcast_podcast_episodes {

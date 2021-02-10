@@ -11,6 +11,7 @@ interface IButtonProps {
   activeIcon?: IconDefinition;
   activeText?: string;
   loading?: boolean;
+  className?: string;
 }
 
 export const Button: React.FC<IButtonProps> = ({
@@ -22,14 +23,15 @@ export const Button: React.FC<IButtonProps> = ({
   activeIcon,
   activeText,
   loading = false,
+  className,
 }) => {
   return (
     <button
-      className={`border rounded-full py-1 px-3 mt-2 text-sm focus:outline-none font-semibold ${
+      className={`border rounded-full py-1 px-3 mt-2 text-sm focus:outline-none ${
         active
           ? "hover:bg-blue-100 active:bg-blue-300 bg-blue-200 text-blue-600"
           : "hover:bg-gray-50 active:bg-gray-200 text-gray-600"
-      } ${disabled && "opacity-60"}`}
+      } ${disabled && "opacity-60"} ${className}`}
       onClick={onClick}
       disabled={disabled}
     >

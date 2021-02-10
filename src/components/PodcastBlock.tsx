@@ -3,28 +3,20 @@ import { Link } from "react-router-dom";
 import { NICO_URL, LYNN_URL, DEFAULT_COVER } from "../constants";
 import { computeTimelapse } from "../helpers";
 import { getCategoriesQueryListner_getCategories_categories_podcasts } from "../__generated__/getCategoriesQueryListner";
+import { PodcastCover } from "./PodcastCover";
 
 interface IPodcastBlock {
   podcast: getCategoriesQueryListner_getCategories_categories_podcasts;
   index: number;
 }
 
+const src = "";
+
 export const PodcastBlock: React.FC<IPodcastBlock> = ({ podcast, index }) => {
   return (
-    <li className={`w-28`}>
-      {/* <li className={`w-28 inline-block ${index !== 0 && "ml-4"}`}> */}
+    <li className="w-28">
       <Link to={`/podcasts/${podcast.id}`}>
-        <img
-          className="object-cover rounded-lg mb-1 w-full h-28"
-          src={
-            podcast.id === 1
-              ? NICO_URL
-              : podcast.id === 3
-              ? LYNN_URL
-              : DEFAULT_COVER
-          }
-          alt="podcast-cover"
-        />
+        <PodcastCover coverUrl={src} title={podcast.title} />
         <h5
           className="text-sm overflow-ellipsis overflow-hidden"
           style={{

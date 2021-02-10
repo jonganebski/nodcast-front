@@ -15,11 +15,11 @@ export const GET_REVIEWS_QUERY = gql`
       reviews {
         id
         text
+        createdAt
+        updatedAt
         creator {
+          id
           username
-          ratings {
-            rating
-          }
         }
       }
     }
