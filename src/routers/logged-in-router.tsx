@@ -4,12 +4,12 @@ import { Header } from "../components/Header";
 import { useMeQuery } from "../hooks/useMeQuery";
 import { Home } from "../pages/Home";
 import { Home as HostHome } from "../pages/Hosts/Home";
-import { DashBoard } from "../pages/Hosts/Dashboard";
 import { Podcast } from "../pages/Podcast";
 import { UserRole } from "../__generated__/globalTypes";
 import { Subscriptions } from "../pages/Subscriptions";
 import { Feeds } from "../pages/Feeds";
 import { Episode } from "../pages/Episode";
+import { Episodes } from "../pages/Hosts/Episodes";
 
 const listenerRoutes = [
   { path: "/", component: <Home /> },
@@ -21,7 +21,7 @@ const listenerRoutes = [
 
 const hostRoutes = [
   { path: "/", component: <HostHome /> },
-  { path: "/podcasts/:podcastId", component: <DashBoard /> },
+  { path: "/episodes", component: <Episodes /> },
 ];
 
 export const LoggedInRouter = () => {

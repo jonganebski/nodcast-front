@@ -21,6 +21,8 @@ export interface getEpisodeQuery_getEpisode_episode {
   title: string;
   createdAt: any;
   description: string;
+  audioUrl: string;
+  dutationSeconds: number;
   podcast: getEpisodeQuery_getEpisode_episode_podcast;
 }
 

@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { EPISODE_FRAGMENT } from "../fragments";
+import { EPISODE_FRAGMENT, REVIEW_FRAGMENT } from "../fragments";
 import {
   getPodcastQuery,
   getPodcastQueryVariables,
@@ -31,6 +31,10 @@ export const GET_PODCAST_QUERY = gql`
         }
         episodes {
           ...EpisodeParts
+        }
+        subscribers {
+          id
+          username
         }
       }
     }

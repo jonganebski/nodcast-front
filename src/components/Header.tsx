@@ -6,6 +6,7 @@ import { useSearchPodcastsQuery } from "../hooks/useSearchPodcastsQuery";
 import { UserRole } from "../__generated__/globalTypes";
 import { meQuery_me } from "../__generated__/meQuery";
 import { EditProfileModal } from "./EditProfileModal";
+import { PodcastForm } from "./PodcastForm";
 
 interface IHeaderProps {
   me: meQuery_me | undefined;
@@ -61,17 +62,19 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
     >
       <div></div>
       <div className="relative w-full max-w-screen-md">
-        <input
-          className="p-3 outline-none bg-gray-100 w-full rounded-md focus:shadow-md focus:bg-white transition-all pointer-events-auto"
-          style={{ pointerEvents: "all" }}
-          placeholder="Search podcast"
-          onChange={onChange}
-          value={searchTerm}
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowSearchResults(true);
-          }}
-        />
+        {me?.role === UserRole.Listener && (
+          <input
+            className="p-3 outline-none bg-gray-100 w-full rounded-md focus:shadow-md focus:bg-white transition-all pointer-events-auto"
+            style={{ pointerEvents: "all" }}
+            placeholder="Search podcast"
+            onChange={onChange}
+            value={searchTerm}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowSearchResults(true);
+            }}
+          />
+        )}
         {showSearchResults && (
           <ul
             className="grid absolute z-10 border rounded-b-md overflow-hidden w-full gap-px bg-gray-200 shadow-md"
@@ -95,7 +98,7 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
         )}
       </div>
       <div
-        className="relative w-9 h-9 rounded-full flex items-center justify-center bg-gray-600 cursor-pointer"
+        className="relative w-9 h-9 my-3 rounded-full flex items-center justify-center bg-gray-600 cursor-pointer"
         onClick={(e) => {
           e.stopPropagation();
           setIsUserPopup(!isUserPopup);
@@ -105,6 +108,12 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
         <span className="text-white">{me?.email[0].toUpperCase()}</span>
         {isUserPopup && me && (
           <ul className="absolute grid gap-px bg-gray-300 top-12 right-0 border rounded-md shadow-lg whitespace-nowrap overflow-hidden text-sm">
+            <li
+              className="px-10 py-3 bg-white hover:bg-gray-100"
+              onClick={() => history.push("/")}
+            >
+              Home
+            </li>
             {me.role === UserRole.Listener && (
               <li
                 className="px-10 py-3 bg-white hover:bg-gray-100"
@@ -119,6 +128,14 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
                 onClick={() => history.push("/subscriptions")}
               >
                 Subscriptions
+              </li>
+            )}
+            {me.role === UserRole.Host && (
+              <li
+                className="px-10 py-3 bg-white hover:bg-gray-100"
+                onClick={() => history.push("/episodes")}
+              >
+                My episodes
               </li>
             )}
             <li

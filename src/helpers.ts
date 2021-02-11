@@ -22,3 +22,20 @@ export const computeTimelapse = (date: any) => {
   }
   return `${result} ${lapseUnit}${result === 1 ? "" : "s"} ago`;
 };
+
+export const shapeAudioDuration = (seconds: number | undefined) => {
+  if (!seconds) {
+    return "unknown";
+  }
+  if (seconds < 60) {
+    return `${seconds} seconds`;
+  } else if (seconds < 60 * 60) {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds - min * 60;
+    return `${min} min ${sec} sec`;
+  } else {
+    const hr = Math.floor((seconds / 60) * 60);
+    const min = Math.floor(seconds / 60 - hr * 60);
+    return `${hr} hr ${min} min`;
+  }
+};

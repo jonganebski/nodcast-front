@@ -16,5 +16,20 @@ export const EPISODE_FRAGMENT = gql`
     title
     createdAt
     description
+    audioUrl
+    dutationSeconds
+  }
+`;
+
+export const REVIEW_FRAGMENT = gql`
+  fragment ReviewParts on Review {
+    id
+    text
+    createdAt
+    updatedAt
+    creator {
+      id
+      username
+    }
   }
 `;

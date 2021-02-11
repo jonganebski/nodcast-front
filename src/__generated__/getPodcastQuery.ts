@@ -32,6 +32,14 @@ export interface getPodcastQuery_getPodcast_podcast_episodes {
   title: string;
   createdAt: any;
   description: string;
+  audioUrl: string;
+  dutationSeconds: number;
+}
+
+export interface getPodcastQuery_getPodcast_podcast_subscribers {
+  __typename: "Users";
+  id: number;
+  username: string;
 }
 
 export interface getPodcastQuery_getPodcast_podcast {
@@ -43,6 +51,7 @@ export interface getPodcastQuery_getPodcast_podcast {
   subscribersCount: number;
   creator: getPodcastQuery_getPodcast_podcast_creator | null;
   episodes: getPodcastQuery_getPodcast_podcast_episodes[];
+  subscribers: getPodcastQuery_getPodcast_podcast_subscribers[];
 }
 
 export interface getPodcastQuery_getPodcast {

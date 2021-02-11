@@ -4,15 +4,20 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL fragment: EpisodeParts
+// GraphQL fragment: ReviewParts
 // ====================================================
 
-export interface EpisodeParts {
-  __typename: "Episode";
+export interface ReviewParts_creator {
+  __typename: "Users";
   id: number;
-  title: string;
+  username: string;
+}
+
+export interface ReviewParts {
+  __typename: "Review";
+  id: number;
+  text: string;
   createdAt: any;
-  description: string;
-  audioUrl: string;
-  dutationSeconds: number;
+  updatedAt: any;
+  creator: ReviewParts_creator;
 }

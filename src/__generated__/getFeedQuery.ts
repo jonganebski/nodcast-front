@@ -19,6 +19,8 @@ export interface getFeedQuery_getFeed_episodes {
   title: string;
   createdAt: any;
   description: string;
+  audioUrl: string;
+  dutationSeconds: number;
   podcast: getFeedQuery_getFeed_episodes_podcast;
 }
 

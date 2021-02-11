@@ -120,7 +120,8 @@ export const ReviewBlock: React.FC<IReviewBlockProps> = ({
           ref={pRef}
         >
           {review.text}
-          {review.createdAt !== review.updatedAt && (
+          {new Date(review.createdAt).getTime() !==
+            new Date(review.updatedAt).getTime() && (
             <span className="text-xs text-gray-500"> (edited)</span>
           )}
         </p>

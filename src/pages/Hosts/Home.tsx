@@ -1,32 +1,14 @@
-import { gql, useMutation } from "@apollo/client";
-import React from "react";
-import { useForm } from "react-hook-form";
-import { client } from "../../apollo";
-import { FormError } from "../../components/FormError";
-import { PODCAST_FORM } from "../../constants";
-import {
-  GET_PODCAST_QUERY,
-  useGetPodcastQuery,
-} from "../../hooks/useGetPodcastQuery";
+import { faHeadphones, faPenNib } from "@fortawesome/free-solid-svg-icons";
+import React, { useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { Button } from "../../components/Button";
+import { PodcastForm } from "../../components/PodcastForm";
+import { RatingStars } from "../../components/RatingStars";
+import { ReviewBlock } from "../../components/ReviewBlock";
+import { ReviewsDrawer } from "../../components/ReviewsDrawer";
+import { useCreatePodcastMutation } from "../../hooks/mutations/useCreatePodcastMutation";
+import { useGetPodcastQuery } from "../../hooks/useGetPodcastQuery";
 import { useMeQuery } from "../../hooks/useMeQuery";
-import {
-  createPodcastMutation,
-  createPodcastMutationVariables,
-} from "../../__generated__/createPodcastMutation";
-import {
-  getPodcastQuery,
-  getPodcastQueryVariables,
-} from "../../__generated__/getPodcastQuery";
-
-const CREATE_PODCAST_MUTATION = gql`
-  mutation createPodcastMutation($input: CreatePodcastInput!) {
-    createPodcast(input: $input) {
-      ok
-      err
-      id
-    }
-  }
-`;
 
 interface IFormProps {
   title: string;
@@ -35,67 +17,17 @@ interface IFormProps {
 }
 
 export const Home = () => {
-  const {
-    register,
-    errors,
-    watch,
-    getValues,
-    handleSubmit,
-  } = useForm<IFormProps>({
+  const { data: userData } = useMeQuery();
+  const [isReviewsOpen, setIsReviewsOpen] = useState(false);
+  const f = useForm<IFormProps>({
     mode: "onChange",
   });
-  const { data: userData } = useMeQuery();
-
-  const onCompleted = (data: createPodcastMutation) => {
-    const {
-      createPodcast: { ok, err, id },
-    } = data;
-    if (ok) {
-      const prevQuery = client.readQuery<
-        getPodcastQuery,
-        getPodcastQueryVariables
-      >({
-        query: GET_PODCAST_QUERY,
-        variables: { input: {} },
-      });
-      if (prevQuery && id && userData) {
-        const { title, description } = getValues();
-        client.writeQuery<getPodcastQuery, getPodcastQueryVariables>({
-          query: GET_PODCAST_QUERY,
-          variables: { input: {} },
-          data: {
-            getPodcast: {
-              ...prevQuery.getPodcast,
-              podcast: {
-                __typename: "Podcast",
-                id,
-                title,
-                description,
-                episodes: [],
-                rating: null,
-                subscribersCount: 0,
-                creator: {
-                  __typename: "Users",
-                  id: userData.me.id,
-                  username: userData.me.username,
-                },
-              },
-            },
-          },
-        });
-      }
-    } else {
-      console.log(err);
-    }
-  };
+  const { getValues } = f;
 
   const [
     createPodcastMutation,
     { loading: createPodcastLoading },
-  ] = useMutation<createPodcastMutation, createPodcastMutationVariables>(
-    CREATE_PODCAST_MUTATION,
-    { onCompleted }
-  );
+  ] = useCreatePodcastMutation({ ...f.getValues() });
 
   const { data, loading } = useGetPodcastQuery();
 
@@ -112,12 +44,88 @@ export const Home = () => {
     });
   };
 
-  const choosenCategoriesCount =
-    getValues().categories?.filter((category) => category.id).length ?? 0;
+  const [audioRecorder, setAudioRecorder] = useState<MediaRecorder | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (audioRecorder) {
+      // audioRecorder.ondataavailable = (e) => {
+      //   const { data: audioFile } = e;
+      //   const link = document.createElement("a");
+      //   link.href = URL.createObjectURL(audioFile);
+      //   link.download = "nodcast-recorded.wav";
+      //   document.body.appendChild(link);
+      //   link.click();
+      // };
+      // audioRecorder.start();
+    }
+  }, [audioRecorder]);
+
   console.log(data);
   return (
-    <main className="container">
-      {data?.getPodcast.podcast ? null : (
+    <main className="grid gap-y-10 place-items-center w-full max-w-screen-2xl px-1 mx-auto">
+      {loading ? null : data?.getPodcast.podcast ? (
+        <>
+          <h2 className="">{data.getPodcast.podcast.title}</h2>
+          <div className="flex flex-col items-center">
+            <RatingStars rating={data.getPodcast.podcast.rating ?? 0} />
+          </div>
+          <div
+            className={`w-52 h-52 rounded-full flex items-center justify-center border cursor-pointer shadow-xl active:shadow-inner bg-gray-700`}
+            onClick={async (e) => {
+              if (navigator.mediaDevices?.getUserMedia) {
+                if (audioRecorder) {
+                  // audioRecorder.stop();
+                  setAudioRecorder(null);
+                } else {
+                  try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                      audio: true,
+                    });
+                    const audioRecorder = new MediaRecorder(stream);
+                    setAudioRecorder(audioRecorder);
+                  } catch (err) {
+                    console.log(err);
+                  }
+                }
+              } else {
+                alert("Audio record is not supported on your browser!");
+              }
+            }}
+          >
+            <div
+              className={"w-3 h-3 rounded-full"}
+              style={{
+                boxShadow: `0px 0px 10px 2px ${
+                  audioRecorder ? "#ff000d" : "#66ff00"
+                }`,
+                backgroundColor: audioRecorder ? "#ff000d" : "#66ff00",
+              }}
+            ></div>
+          </div>
+          <div className="grid">
+            <Button
+              text="Reviews"
+              onClick={() => setIsReviewsOpen(true)}
+              icon={faPenNib}
+            />
+            <Button
+              text={`Subscribers: ${data.getPodcast.podcast.subscribersCount}`}
+              icon={faHeadphones}
+            />
+          </div>
+          {userData && (
+            <ReviewsDrawer
+              userData={userData}
+              podcastId={data.getPodcast.podcast.id}
+              podcastCreatorId={userData.me.id}
+              isReviewsOpen={isReviewsOpen}
+              setIsReviewsOpen={setIsReviewsOpen}
+            />
+          )}
+        </>
+      ) : (
         <>
           <h2 className="mb-5">Welcome 🙌</h2>
           <p className="text-sm mb-20">
@@ -126,81 +134,12 @@ export const Home = () => {
             purpose. Please remember you only can make one podcast channel per
             one host account.
           </p>
-          <form className="grid gap-y-5" onSubmit={handleSubmit(onSubmit)}>
-            <label className="grid gap-y-1">
-              <span className="text-sm">Title:</span>
-              <input
-                className="p-3 border border-gray-400"
-                ref={register({
-                  required: PODCAST_FORM.TITLE_REQUIRED_ERR,
-                  maxLength: {
-                    value: PODCAST_FORM.TITLE_MAX_LENGTH,
-                    message: PODCAST_FORM.TITLE_MAX_LENGTH_ERR,
-                  },
-                })}
-                name="title"
-                placeholder="Title of your podcast"
-              />
-              {errors.title && <FormError err={errors.title.message} />}
-            </label>
-            <label className="grid gap-y-1">
-              <div className="flex justify-between text-sm">
-                <span>Description:</span>
-                <span
-                  className={`${
-                    errors.description?.type === "maxLength" && "text-red-500"
-                  }`}
-                >
-                  ({watch().description?.length} /{" "}
-                  {PODCAST_FORM.PODCAST_DESC_MAX_LENGTH})
-                </span>
-              </div>
-              <textarea
-                className="h-40 p-3 border border-gray-400 resize-none"
-                ref={register({
-                  maxLength: {
-                    value: PODCAST_FORM.PODCAST_DESC_MAX_LENGTH,
-                    message: PODCAST_FORM.PODCAST_DESC_MAX_LENGTH_ERR,
-                  },
-                })}
-                name="description"
-                placeholder="Describe your podcast"
-              />
-              {errors.description && (
-                <FormError err={errors.description.message} />
-              )}
-            </label>
-            <div>
-              <span className="text-sm">
-                Choose categories of your podcast: ({choosenCategoriesCount}
-                /3)
-              </span>
-              <div className="mt-2 grid grid-cols-3">
-                {data?.getPodcast.categories?.map((category, i) => {
-                  return (
-                    <label
-                      className="flex items-center cursor-pointer"
-                      key={category.id}
-                    >
-                      <input
-                        className="mr-2"
-                        ref={register()}
-                        type="checkbox"
-                        name={`categories[${i}].id`}
-                        value={category.id}
-                        disabled={
-                          choosenCategoriesCount >= 3 &&
-                          getValues().categories[i].id === false
-                        }
-                      />
-                      <span>{category.name}</span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-            <button className="w-full py-4 border">Create podcast</button>
-          </form>
+          <FormProvider {...f}>
+            <PodcastForm
+              categories={data?.getPodcast.categories}
+              onSubmit={onSubmit}
+            />
+          </FormProvider>
         </>
       )}
     </main>

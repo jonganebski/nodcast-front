@@ -1,5 +1,6 @@
 import { gql, useLazyQuery } from "@apollo/client";
 import { client } from "../apollo";
+import { REVIEW_FRAGMENT } from "../fragments";
 import {
   getReviewsQuery,
   getReviewsQueryVariables,
@@ -13,17 +14,11 @@ export const GET_REVIEWS_QUERY = gql`
       currentPage
       totalPages
       reviews {
-        id
-        text
-        createdAt
-        updatedAt
-        creator {
-          id
-          username
-        }
+        ...ReviewParts
       }
     }
   }
+  ${REVIEW_FRAGMENT}
 `;
 
 export const useGetReviewsLazyQuery = (podcastId: number) => {

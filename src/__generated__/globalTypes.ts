@@ -19,6 +19,13 @@ export interface CreateAccountInput {
   password: string;
 }
 
+export interface CreateEpisodeInput {
+  title: string;
+  audioUrl: string;
+  dutationSeconds: number;
+  description?: string | null;
+}
+
 export interface CreatePodcastInput {
   title: string;
   description?: string | null;
@@ -28,6 +35,18 @@ export interface CreatePodcastInput {
 export interface CreateReviewInput {
   podcastId: number;
   text: string;
+}
+
+export interface DeleteEpisodeInput {
+  episodeId: number;
+}
+
+export interface EditEpisodeInput {
+  episodeId: number;
+  title: string;
+  audioUrl: string;
+  dutationSeconds: number;
+  description?: string | null;
 }
 
 export interface EditProfileInput {

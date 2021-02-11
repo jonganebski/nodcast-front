@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL fragment: EpisodeParts
+// GraphQL query operation: getEpisodesQuery
 // ====================================================
 
-export interface EpisodeParts {
+export interface getEpisodesQuery_getEpisodes_episodes {
   __typename: "Episode";
   id: number;
   title: string;
@@ -15,4 +15,15 @@ export interface EpisodeParts {
   description: string;
   audioUrl: string;
   dutationSeconds: number;
+}
+
+export interface getEpisodesQuery_getEpisodes {
+  __typename: "GetEpisodesOutput";
+  ok: boolean;
+  err: string | null;
+  episodes: getEpisodesQuery_getEpisodes_episodes[] | null;
+}
+
+export interface getEpisodesQuery {
+  getEpisodes: getEpisodesQuery_getEpisodes;
 }

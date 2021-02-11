@@ -1,7 +1,7 @@
 export const TOKEN_NAME = "challenge-token";
 
-// export const SERVER_URI = "https://nodcast.herokuapp.com/graphql";
-export const SERVER_URI = "http://localhost:4000/graphql";
+// export const SERVER_URI = "https://nodcast.herokuapp.com";
+export const SERVER_URI = "http://localhost:4000";
 
 export const NICO_URL =
   "https://www.filepicker.io/api/file/BoxcB3m3TgmVXxoomCAv";
@@ -54,4 +54,13 @@ export const PODCAST_FORM = {
   TITLE_MAX_LENGTH_ERR: "Title is too long",
   PODCAST_DESC_MAX_LENGTH: 1000,
   PODCAST_DESC_MAX_LENGTH_ERR: `Description is too long`,
+};
+
+export const EPISODE_FORM = {
+  FILE_REQUIRED_ERR: "Audio file is required",
+  TITLE_REQUIRED_ERR: "Title is required",
+  TITLE_MAX_LENGTH: 50,
+  TITLE_MAX_LENGTH_ERR: "Title is too long",
+  DESC_MAX_LENGTH: 1000,
+  DESC_MAX_LENGTH_ERR: `Description is too long`,
 };

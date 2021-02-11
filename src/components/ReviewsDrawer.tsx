@@ -101,13 +101,7 @@ export const ReviewsDrawer: React.FC<IReviewsDrawerProps> = ({
             getReviews: {
               ...previousQuery.getReviews,
               reviews: previousQuery.getReviews.reviews
-                ? [
-                    newReview,
-                    ...previousQuery.getReviews.reviews.slice(
-                      0,
-                      previousQuery.getReviews.reviews.length - 1
-                    ),
-                  ]
+                ? [newReview, ...previousQuery.getReviews.reviews].slice(0, 10)
                 : [newReview],
             },
           },

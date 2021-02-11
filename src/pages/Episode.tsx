@@ -5,11 +5,13 @@ import { Link, useParams } from "react-router-dom";
 import { Button } from "../components/Button";
 import { PodcastCover } from "../components/PodcastCover";
 import { EPISODE_FRAGMENT } from "../fragments";
-import { computeTimelapse } from "../helpers";
+import { computeTimelapse, shapeAudioDuration } from "../helpers";
+import { useMeQuery } from "../hooks/useMeQuery";
 import {
   getEpisodeQuery,
   getEpisodeQueryVariables,
 } from "../__generated__/getEpisodeQuery";
+import { UserRole } from "../__generated__/globalTypes";
 
 const GET_EPISODE_QUERY = gql`
   query getEpisodeQuery($input: GetEpisodeInput!) {
@@ -58,7 +60,13 @@ export const Episode = () => {
         <h3 className=" mb-4 text-lg font-semibold">
           {data?.getEpisode.episode?.title}
         </h3>
-        <Button text="Play • 2hours" icon={faPlayCircle} className="mb-8" />
+        <Button
+          text={`Play • ${shapeAudioDuration(
+            data?.getEpisode.episode?.dutationSeconds
+          )}`}
+          icon={faPlayCircle}
+          className="mb-8"
+        />
         <p className="text-sm text-gray-700">
           {data?.getEpisode.episode?.description}
         </p>
