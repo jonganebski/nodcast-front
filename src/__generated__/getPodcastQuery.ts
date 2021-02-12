@@ -42,6 +42,12 @@ export interface getPodcastQuery_getPodcast_podcast_subscribers {
   username: string;
 }
 
+export interface getPodcastQuery_getPodcast_podcast_categories {
+  __typename: "Category";
+  id: number;
+  name: string;
+}
+
 export interface getPodcastQuery_getPodcast_podcast {
   __typename: "Podcast";
   id: number;
@@ -49,9 +55,11 @@ export interface getPodcastQuery_getPodcast_podcast {
   description: string;
   rating: number | null;
   subscribersCount: number;
+  coverUrl: string | null;
   creator: getPodcastQuery_getPodcast_podcast_creator | null;
   episodes: getPodcastQuery_getPodcast_podcast_episodes[];
   subscribers: getPodcastQuery_getPodcast_podcast_subscribers[];
+  categories: getPodcastQuery_getPodcast_podcast_categories[];
 }
 
 export interface getPodcastQuery_getPodcast {

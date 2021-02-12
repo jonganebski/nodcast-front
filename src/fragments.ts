@@ -7,6 +7,7 @@ export const PODCAST_FRAGMENT = gql`
     subscribersCount
     description
     updatedAt
+    coverUrl
   }
 `;
 
@@ -32,4 +33,31 @@ export const REVIEW_FRAGMENT = gql`
       username
     }
   }
+`;
+
+export const GET_PODCAST_QUERY_FRAGMENT = gql`
+  fragment GetPodcastParts on Podcast {
+    id
+    title
+    description
+    rating
+    subscribersCount
+    coverUrl
+    creator {
+      id
+      username
+    }
+    episodes {
+      ...EpisodeParts
+    }
+    subscribers {
+      id
+      username
+    }
+    categories {
+      id
+      name
+    }
+  }
+  ${EPISODE_FRAGMENT}
 `;

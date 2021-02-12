@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { EPISODE_FRAGMENT, REVIEW_FRAGMENT } from "../fragments";
+import { GET_PODCAST_QUERY_FRAGMENT } from "../fragments";
 import {
   getPodcastQuery,
   getPodcastQueryVariables,
@@ -20,26 +20,11 @@ export const GET_PODCAST_QUERY = gql`
         name
       }
       podcast {
-        id
-        title
-        description
-        rating
-        subscribersCount
-        creator {
-          id
-          username
-        }
-        episodes {
-          ...EpisodeParts
-        }
-        subscribers {
-          id
-          username
-        }
+        ...GetPodcastParts
       }
     }
   }
-  ${EPISODE_FRAGMENT}
+  ${GET_PODCAST_QUERY_FRAGMENT}
 `;
 
 export const useGetPodcastQuery = (podcastId?: number) => {

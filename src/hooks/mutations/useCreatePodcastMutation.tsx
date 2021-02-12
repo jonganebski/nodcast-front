@@ -1,5 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import { client } from "../../apollo";
+import { PODCAST_FRAGMENT } from "../../fragments";
 import {
   createPodcastMutation,
   createPodcastMutationVariables,
@@ -16,23 +17,24 @@ const CREATE_PODCAST_MUTATION = gql`
     createPodcast(input: $input) {
       ok
       err
-      id
+      podcast {
+        ...PodcastParts
+      }
+      categories {
+        id
+        name
+      }
     }
   }
+  ${PODCAST_FRAGMENT}
 `;
 
-export const useCreatePodcastMutation = ({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) => {
+export const useCreatePodcastMutation = () => {
   const { data: userData } = useMeQuery();
 
   const onCompleted = (data: createPodcastMutation) => {
     const {
-      createPodcast: { ok, err, id },
+      createPodcast: { ok, err, podcast: created, categories },
     } = data;
     if (ok) {
       const prevQuery = client.readQuery<
@@ -42,7 +44,7 @@ export const useCreatePodcastMutation = ({
         query: GET_PODCAST_QUERY,
         variables: { input: {} },
       });
-      if (prevQuery && id && userData) {
+      if (prevQuery && created && categories && userData) {
         client.writeQuery<getPodcastQuery, getPodcastQueryVariables>({
           query: GET_PODCAST_QUERY,
           variables: { input: {} },
@@ -50,12 +52,9 @@ export const useCreatePodcastMutation = ({
             getPodcast: {
               ...prevQuery.getPodcast,
               podcast: {
-                __typename: "Podcast",
-                id,
-                title,
-                description,
+                ...created,
+                categories,
                 rating: null,
-                subscribersCount: 0,
                 episodes: [],
                 subscribers: [],
                 creator: {

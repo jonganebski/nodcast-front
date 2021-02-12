@@ -73,24 +73,11 @@ export const EpisodeForm: React.FC<IEpisodeFromProps> = ({
     if (editTarget && !fileInfo) {
       const { title, description } = editTarget;
       reset({ title, description });
-      fetch(editTarget.audioUrl)
-        .then((res) => res.blob())
-        .then((blob) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            if (e.target?.result && typeof e.target.result !== "string") {
-              const audioContext = new AudioContext();
-              audioContext.decodeAudioData(e.target.result, (buffer) => {
-                setFileInfo({
-                  duration: Math.round(buffer.duration),
-                  fileName: editTarget.audioUrl.split("audios/")[1],
-                  lastModified: new Date(editTarget.createdAt).getTime(),
-                });
-              });
-            }
-          };
-          reader.readAsArrayBuffer(blob);
-        });
+      setFileInfo({
+        duration: editTarget.dutationSeconds,
+        fileName: editTarget.audioUrl.split("audios/")[1],
+        lastModified: editTarget.createdAt,
+      });
     }
   }, [editTarget, fileInfo, reset, setFileInfo]);
 

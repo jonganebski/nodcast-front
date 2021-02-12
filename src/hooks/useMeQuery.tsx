@@ -8,6 +8,7 @@ export const ME_QUERY = gql`
       email
       username
       role
+      avatarUrl
       subscriptions {
         id
       }

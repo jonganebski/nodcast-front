@@ -1,23 +1,37 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { PODCAST_FORM } from "../constants";
-import { getPodcastQuery_getPodcast_categories } from "../__generated__/getPodcastQuery";
+import {
+  getPodcastQuery_getPodcast_categories,
+  getPodcastQuery_getPodcast_podcast,
+} from "../__generated__/getPodcastQuery";
+import { ButtonWide } from "./ButtonWide";
 import { FormError } from "./FormError";
+import { PodcastCover } from "./PodcastCover";
 
-interface IFormProps {
+export interface IPodcastForm {
   title: string;
   description: string;
   categories: { id: string | boolean }[];
+  files: FileList;
 }
 
 interface IPodcastFormProps {
   categories: getPodcastQuery_getPodcast_categories[] | null | undefined;
   onSubmit: () => void;
+  submitLoading: boolean;
+  setSrc: React.Dispatch<React.SetStateAction<string>>;
+  src: string;
+  editTarget?: getPodcastQuery_getPodcast_podcast | null | undefined;
 }
 
 export const PodcastForm: React.FC<IPodcastFormProps> = ({
   categories,
   onSubmit,
+  submitLoading,
+  setSrc,
+  src,
+  editTarget,
 }) => {
   const {
     handleSubmit,
@@ -25,29 +39,74 @@ export const PodcastForm: React.FC<IPodcastFormProps> = ({
     errors,
     watch,
     getValues,
-  } = useFormContext<IFormProps>();
+    formState,
+  } = useFormContext<IPodcastForm>();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const choosenCategoriesCount =
     getValues().categories?.filter((category) => category.id).length ?? 0;
 
   return (
     <form className="grid gap-y-5 w-full" onSubmit={handleSubmit(onSubmit)}>
-      <label className="grid gap-y-1">
-        <span className="text-sm">Title:</span>
+      <div className="flex justify-between">
+        <label className="mt-auto w-2/3 grid gap-y-1">
+          <span className="text-sm">Title:</span>
+          <input
+            className="px-3 py-2 border border-gray-400"
+            ref={register({
+              required: PODCAST_FORM.TITLE_REQUIRED_ERR,
+              maxLength: {
+                value: PODCAST_FORM.TITLE_MAX_LENGTH,
+                message: PODCAST_FORM.TITLE_MAX_LENGTH_ERR,
+              },
+            })}
+            name="title"
+            placeholder="Title of your podcast"
+          />
+          {errors.title && <FormError err={errors.title.message} />}
+        </label>
+        <div
+          className="cursor-pointer"
+          onClick={() => {
+            if (fileInputRef.current) {
+              fileInputRef.current.click();
+            }
+          }}
+        >
+          <PodcastCover size={28} coverUrl={src} title={watch().title} />
+        </div>
         <input
-          className="p-3 border border-gray-400"
-          ref={register({
-            required: PODCAST_FORM.TITLE_REQUIRED_ERR,
-            maxLength: {
-              value: PODCAST_FORM.TITLE_MAX_LENGTH,
-              message: PODCAST_FORM.TITLE_MAX_LENGTH_ERR,
-            },
-          })}
-          name="title"
-          placeholder="Title of your podcast"
+          className="hidden"
+          ref={(ref) => {
+            register(ref);
+            fileInputRef.current = ref;
+          }}
+          name="files"
+          type="file"
+          multiple={false}
+          accept="image/jpeg, image/jpg"
+          onChange={(e) => {
+            const { files } = e.currentTarget;
+            if (files && files?.[0]) {
+              const file = files[0];
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                const result = e.target?.result;
+                if (result && typeof result === "string") {
+                  setSrc(result);
+                }
+              };
+              reader.readAsDataURL(file);
+            } else {
+              if (editTarget?.coverUrl) {
+                setSrc(editTarget.coverUrl);
+              } else {
+                setSrc("");
+              }
+            }
+          }}
         />
-        {errors.title && <FormError err={errors.title.message} />}
-      </label>
+      </div>
       <label className="grid gap-y-1">
         <div className="flex justify-between text-sm">
           <span>Description:</span>
@@ -102,7 +161,11 @@ export const PodcastForm: React.FC<IPodcastFormProps> = ({
           })}
         </div>
       </div>
-      <button className="w-full py-4 border">Create podcast</button>
+      <ButtonWide
+        text={editTarget ? "Edit podcast" : "Create podcast"}
+        disabled={!formState.isValid}
+        loading={submitLoading}
+      />
     </form>
   );
 };

@@ -9,12 +9,12 @@ import { HelmetProvider } from "react-helmet-async";
 
 const rootElement = document.getElementById("root");
 render(
-  <React.StrictMode>
-    <ApolloProvider client={client}>
-      <HelmetProvider>
-        <App />
-      </HelmetProvider>
-    </ApolloProvider>
-  </React.StrictMode>,
+  // <React.StrictMode>
+  <ApolloProvider client={client}>
+    <HelmetProvider>
+      <App />
+    </HelmetProvider>
+  </ApolloProvider>,
+  // </React.StrictMode>,
   rootElement
 );

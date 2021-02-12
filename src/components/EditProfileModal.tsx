@@ -1,8 +1,10 @@
 import { gql, useMutation } from "@apollo/client";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
+import { data } from "autoprefixer";
+import React, { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { uploadFile } from "../api/uploadFile";
 import { client } from "../apollo";
 import {
   editProfileMutation,
@@ -15,6 +17,7 @@ import {
   PasswordInput,
   UsernameInput,
 } from "./AuthFormInputs";
+import { Avatar } from "./Avatar";
 import { Button } from "./Button";
 
 const EDIT_PROFILE_MUTATION = gql`
@@ -27,6 +30,7 @@ const EDIT_PROFILE_MUTATION = gql`
 `;
 
 interface IFormProps {
+  files: FileList;
   email: string;
   username: string;
   password: string;
@@ -44,6 +48,9 @@ export const EditProfileModal: React.FC<IEditProfileModalProps> = ({
   setIsEditProfileOpen,
   me,
 }) => {
+  const [editProfileLoading, setEditProfileLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [src, setSrc] = useState(me.avatarUrl ?? "");
   const f = useForm<IFormProps>({
     mode: "onChange",
     defaultValues: { email: me.email, username: me.username },
@@ -90,16 +97,29 @@ export const EditProfileModal: React.FC<IEditProfileModalProps> = ({
     }
   };
 
-  const [
+  const [editProfileMutation] = useMutation<
     editProfileMutation,
-    { loading: editProfileLoading, error },
-  ] = useMutation<editProfileMutation, editProfileMutationVariables>(
-    EDIT_PROFILE_MUTATION,
-    { onCompleted: onEditProfileCompleted }
-  );
+    editProfileMutationVariables
+  >(EDIT_PROFILE_MUTATION, { onCompleted: onEditProfileCompleted });
 
-  const onSubmit = () => {
-    const { email, username, password } = getValues();
+  const onSubmit = async () => {
+    setEditProfileLoading(true);
+    const { email, username, password, files } = getValues();
+    let avatarUrl = me.avatarUrl;
+    if (files && files[0]) {
+      try {
+        const formData = new FormData();
+        formData.append("file", files[0]);
+        const { ok, err, url } = await uploadFile(formData);
+        if (ok && url) {
+          avatarUrl = url;
+        } else {
+          console.log(err);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
     if (password) {
       editProfileMutation({
         variables: { input: { email, username, password } },
@@ -109,6 +129,7 @@ export const EditProfileModal: React.FC<IEditProfileModalProps> = ({
         variables: { input: { email, username } },
       });
     }
+    setEditProfileLoading(false);
   };
 
   return (
@@ -135,6 +156,45 @@ export const EditProfileModal: React.FC<IEditProfileModalProps> = ({
         <FormProvider {...f}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="grid gap-y-2 mb-4">
+              <div className="flex justify-center">
+                <Avatar
+                  me={me}
+                  src={src}
+                  size={14}
+                  onClick={() => {
+                    if (fileInputRef.current) {
+                      fileInputRef.current.click();
+                    }
+                  }}
+                />
+                <input
+                  className="hidden"
+                  ref={(ref) => {
+                    f.register(ref);
+                    fileInputRef.current = ref;
+                  }}
+                  name="files"
+                  type="file"
+                  multiple={false}
+                  accept="image/jpeg, image/jpg"
+                  onChange={(e) => {
+                    const files = e.currentTarget.files;
+                    if (files && files[0]) {
+                      const file = files[0];
+                      const reader = new FileReader();
+                      reader.onload = (e) => {
+                        const result = e.target?.result;
+                        if (result && typeof result === "string") {
+                          setSrc(result);
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    } else {
+                      setSrc(me.avatarUrl ?? "");
+                    }
+                  }}
+                />
+              </div>
               <EmailInput />
               <UsernameInput />
             </div>

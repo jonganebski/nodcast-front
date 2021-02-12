@@ -7,6 +7,11 @@ export const GET_EPISODES_QUERY = gql`
     getEpisodes {
       ok
       err
+      podcast {
+        id
+        title
+        coverUrl
+      }
       episodes {
         ...EpisodeParts
       }

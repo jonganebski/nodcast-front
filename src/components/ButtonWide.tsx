@@ -13,8 +13,8 @@ export const ButtonWide: React.FC<IButtonWideProps> = ({
 }) => {
   return (
     <button
-      className={`w-full py-4 border text-gray-900 ${
-        disabled ? "bg-gray-900" : "bg-white hover:border-gray-900"
+      className={`w-full py-4 border bg-white text-gray-900 ${
+        disabled ? "opacity-50" : "hover:border-gray-900 opacity-100"
       }`}
       style={{ transition: "background-color 1s ease-in-out" }}
       disabled={disabled || loading}

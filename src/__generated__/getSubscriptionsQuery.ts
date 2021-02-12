@@ -14,6 +14,7 @@ export interface getSubscriptionsQuery_getSubscriptions_podcasts {
   subscribersCount: number;
   description: string;
   updatedAt: any;
+  coverUrl: string | null;
 }
 
 export interface getSubscriptionsQuery_getSubscriptions {

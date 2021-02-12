@@ -14,4 +14,5 @@ export interface PodcastParts {
   subscribersCount: number;
   description: string;
   updatedAt: any;
+  coverUrl: string | null;
 }

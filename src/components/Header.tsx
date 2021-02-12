@@ -5,8 +5,8 @@ import { TOKEN_NAME } from "../constants";
 import { useSearchPodcastsQuery } from "../hooks/useSearchPodcastsQuery";
 import { UserRole } from "../__generated__/globalTypes";
 import { meQuery_me } from "../__generated__/meQuery";
+import { Avatar } from "./Avatar";
 import { EditProfileModal } from "./EditProfileModal";
-import { PodcastForm } from "./PodcastForm";
 
 interface IHeaderProps {
   me: meQuery_me | undefined;
@@ -77,7 +77,7 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
         )}
         {showSearchResults && (
           <ul
-            className="grid absolute z-10 border rounded-b-md overflow-hidden w-full gap-px bg-gray-200 shadow-md"
+            className="grid absolute border rounded-b-md overflow-hidden w-full gap-px bg-gray-200 shadow-md"
             ref={ulRef}
           >
             {data?.searchPodcasts.podcasts?.map((podcast) => {
@@ -97,17 +97,17 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
           </ul>
         )}
       </div>
-      <div
-        className="relative w-9 h-9 my-3 rounded-full flex items-center justify-center bg-gray-600 cursor-pointer"
+      <Avatar
+        me={me}
+        src={me?.avatarUrl ?? ""}
+        className="my-3"
         onClick={(e) => {
           e.stopPropagation();
           setIsUserPopup(!isUserPopup);
         }}
       >
-        {/* <image /> */}
-        <span className="text-white">{me?.email[0].toUpperCase()}</span>
         {isUserPopup && me && (
-          <ul className="absolute grid gap-px bg-gray-300 top-12 right-0 border rounded-md shadow-lg whitespace-nowrap overflow-hidden text-sm">
+          <ul className="absolute z-10 grid gap-px bg-gray-300 top-12 right-0 border rounded-md shadow-lg whitespace-nowrap overflow-hidden text-sm">
             <li
               className="px-10 py-3 bg-white hover:bg-gray-100"
               onClick={() => history.push("/")}
@@ -115,28 +115,36 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
               Home
             </li>
             {me.role === UserRole.Listener && (
-              <li
-                className="px-10 py-3 bg-white hover:bg-gray-100"
-                onClick={() => history.push("/feeds")}
-              >
-                My feed
-              </li>
-            )}
-            {me.role === UserRole.Listener && (
-              <li
-                className="px-10 py-3 bg-white hover:bg-gray-100"
-                onClick={() => history.push("/subscriptions")}
-              >
-                Subscriptions
-              </li>
+              <>
+                <li
+                  className="px-10 py-3 bg-white hover:bg-gray-100"
+                  onClick={() => history.push("/feeds")}
+                >
+                  My feed
+                </li>
+                <li
+                  className="px-10 py-3 bg-white hover:bg-gray-100"
+                  onClick={() => history.push("/subscriptions")}
+                >
+                  Subscriptions
+                </li>
+              </>
             )}
             {me.role === UserRole.Host && (
-              <li
-                className="px-10 py-3 bg-white hover:bg-gray-100"
-                onClick={() => history.push("/episodes")}
-              >
-                My episodes
-              </li>
+              <>
+                <li
+                  className="px-10 py-3 bg-white hover:bg-gray-100"
+                  onClick={() => history.push("/episodes")}
+                >
+                  My episodes
+                </li>
+                <li
+                  className="px-10 py-3 bg-white hover:bg-gray-100"
+                  onClick={() => history.push("/edit-podcast")}
+                >
+                  Edit podcast
+                </li>
+              </>
             )}
             <li
               className="px-10 py-3 bg-white hover:bg-gray-100"
@@ -156,7 +164,7 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
             </li>
           </ul>
         )}
-      </div>
+      </Avatar>
       {me && (
         <EditProfileModal
           isEditProfileOpen={isEditProfileOpen}

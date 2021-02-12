@@ -20,6 +20,7 @@ export interface meQuery_me {
   email: string;
   username: string;
   role: UserRole;
+  avatarUrl: string | null;
   subscriptions: meQuery_me_subscriptions[];
 }
 

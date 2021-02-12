@@ -1,47 +1,58 @@
 import { faHeadphones, faPenNib } from "@fortawesome/free-solid-svg-icons";
 import React, { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { uploadFile } from "../../api/uploadFile";
 import { Button } from "../../components/Button";
-import { PodcastForm } from "../../components/PodcastForm";
+import { IPodcastForm, PodcastForm } from "../../components/PodcastForm";
 import { RatingStars } from "../../components/RatingStars";
-import { ReviewBlock } from "../../components/ReviewBlock";
 import { ReviewsDrawer } from "../../components/ReviewsDrawer";
 import { useCreatePodcastMutation } from "../../hooks/mutations/useCreatePodcastMutation";
 import { useGetPodcastQuery } from "../../hooks/useGetPodcastQuery";
 import { useMeQuery } from "../../hooks/useMeQuery";
 
-interface IFormProps {
-  title: string;
-  description: string;
-  categories: { id: string | boolean }[];
-}
-
 export const Home = () => {
   const { data: userData } = useMeQuery();
+  const [src, setSrc] = useState("");
+  const [submitLoading, setSubmitLoading] = useState(false);
   const [isReviewsOpen, setIsReviewsOpen] = useState(false);
-  const f = useForm<IFormProps>({
+  const f = useForm<IPodcastForm>({
     mode: "onChange",
   });
   const { getValues } = f;
 
-  const [
-    createPodcastMutation,
-    { loading: createPodcastLoading },
-  ] = useCreatePodcastMutation({ ...f.getValues() });
+  const [createPodcastMutation] = useCreatePodcastMutation();
 
   const { data, loading } = useGetPodcastQuery();
 
-  const onSubmit = () => {
-    const { categories, title, description } = getValues();
+  const onSubmit = async () => {
+    setSubmitLoading(true);
+    const { categories, title, description, files } = getValues();
+    const file = files?.[0];
+    let coverUrl = "";
+    if (file) {
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const { ok, url } = await uploadFile(formData);
+        if (ok && url) {
+          coverUrl = url;
+        } else {
+          throw new Error();
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
     const categoryIds = categories.reduce((acc, value) => {
       if (value.id) {
         acc.push(+value.id);
       }
       return acc;
     }, [] as number[]);
-    createPodcastMutation({
-      variables: { input: { title, description, categoryIds } },
+    await createPodcastMutation({
+      variables: { input: { title, description, categoryIds, coverUrl } },
     });
+    setSubmitLoading(false);
   };
 
   const [audioRecorder, setAudioRecorder] = useState<MediaRecorder | null>(
@@ -50,19 +61,18 @@ export const Home = () => {
 
   useEffect(() => {
     if (audioRecorder) {
-      // audioRecorder.ondataavailable = (e) => {
-      //   const { data: audioFile } = e;
-      //   const link = document.createElement("a");
-      //   link.href = URL.createObjectURL(audioFile);
-      //   link.download = "nodcast-recorded.wav";
-      //   document.body.appendChild(link);
-      //   link.click();
-      // };
-      // audioRecorder.start();
+      audioRecorder.ondataavailable = (e) => {
+        const { data: audioFile } = e;
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(audioFile);
+        link.download = "nodcast-recorded.webm";
+        document.body.appendChild(link);
+        link.click();
+      };
+      audioRecorder.start();
     }
   }, [audioRecorder]);
 
-  console.log(data);
   return (
     <main className="grid gap-y-10 place-items-center w-full max-w-screen-2xl px-1 mx-auto">
       {loading ? null : data?.getPodcast.podcast ? (
@@ -76,7 +86,7 @@ export const Home = () => {
             onClick={async (e) => {
               if (navigator.mediaDevices?.getUserMedia) {
                 if (audioRecorder) {
-                  // audioRecorder.stop();
+                  audioRecorder.stop();
                   setAudioRecorder(null);
                 } else {
                   try {
@@ -126,7 +136,7 @@ export const Home = () => {
           )}
         </>
       ) : (
-        <>
+        <div className="container">
           <h2 className="mb-5">Welcome 🙌</h2>
           <p className="text-sm mb-20">
             It's happy to see my new host! I hope you to share wonderful
@@ -136,11 +146,14 @@ export const Home = () => {
           </p>
           <FormProvider {...f}>
             <PodcastForm
+              setSrc={setSrc}
+              src={src}
               categories={data?.getPodcast.categories}
               onSubmit={onSubmit}
+              submitLoading={submitLoading}
             />
           </FormProvider>
-        </>
+        </div>
       )}
     </main>
   );

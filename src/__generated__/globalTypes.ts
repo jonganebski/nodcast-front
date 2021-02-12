@@ -30,6 +30,7 @@ export interface CreatePodcastInput {
   title: string;
   description?: string | null;
   categoryIds?: number[] | null;
+  coverUrl?: string | null;
 }
 
 export interface CreateReviewInput {
@@ -47,6 +48,14 @@ export interface EditEpisodeInput {
   audioUrl: string;
   dutationSeconds: number;
   description?: string | null;
+}
+
+export interface EditPodcastInput {
+  title: string;
+  podcastId: number;
+  description?: string | null;
+  coverUrl?: string | null;
+  categoryIds: number[];
 }
 
 export interface EditProfileInput {

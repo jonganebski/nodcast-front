@@ -14,6 +14,7 @@ export interface getCategoriesQueryListner_getCategories_categories_podcasts {
   subscribersCount: number;
   description: string;
   updatedAt: any;
+  coverUrl: string | null;
 }
 
 export interface getCategoriesQueryListner_getCategories_categories {

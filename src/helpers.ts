@@ -39,3 +39,36 @@ export const shapeAudioDuration = (seconds: number | undefined) => {
     return `${hr} hr ${min} min`;
   }
 };
+
+export const shapeAudioDurationDetail = (seconds: number | undefined) => {
+  if (!seconds) {
+    return "00:00:00";
+  }
+  const hr = Math.floor(seconds / (60 * 60));
+  const min = Math.floor(seconds / 60 - hr * 60 * 60);
+  const sec = Math.ceil(seconds - min * 60);
+  return `${hr.toString().padStart(2, "0")}:${min
+    .toString()
+    .padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
+};
+
+export const shapeDurationLeft = (
+  ref: React.MutableRefObject<HTMLAudioElement | null>
+) => {
+  if (!ref.current?.duration) {
+    return "";
+  }
+  const lapseSeconds = ref.current.duration - ref.current.currentTime;
+  if (lapseSeconds < 60) {
+    return "ends soon...";
+  }
+  if (lapseSeconds < 60 * 60) {
+    const min = Math.floor(lapseSeconds / 60);
+    return `${min} minute${min !== 1 ? "s" : ""} left`;
+  }
+  const hr = Math.floor(lapseSeconds / (60 * 60));
+  const min = Math.floor(lapseSeconds / 60 - hr * 60);
+  return `${hr} hour${hr !== 1 ? "s" : ""} ${
+    min !== 0 && `${min} minute${min !== 1 ? "s" : ""} left`
+  }`;
+};

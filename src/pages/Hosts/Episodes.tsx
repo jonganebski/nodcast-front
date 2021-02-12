@@ -119,6 +119,8 @@ export const Episodes = () => {
                   <EpisodeBlock
                     episode={episode}
                     isCreator={true}
+                    podcastTitle={data.getEpisodes.podcast?.title}
+                    coverUrl={data.getEpisodes.podcast?.coverUrl}
                     startEditEpisode={startEditEpisode}
                     setDeleteTargetId={setDeleteTargetId}
                     key={episode.id}

@@ -7,6 +7,13 @@
 // GraphQL query operation: getEpisodesQuery
 // ====================================================
 
+export interface getEpisodesQuery_getEpisodes_podcast {
+  __typename: "Podcast";
+  id: number;
+  title: string;
+  coverUrl: string | null;
+}
+
 export interface getEpisodesQuery_getEpisodes_episodes {
   __typename: "Episode";
   id: number;
@@ -21,6 +28,7 @@ export interface getEpisodesQuery_getEpisodes {
   __typename: "GetEpisodesOutput";
   ok: boolean;
   err: string | null;
+  podcast: getEpisodesQuery_getEpisodes_podcast | null;
   episodes: getEpisodesQuery_getEpisodes_episodes[] | null;
 }
 
