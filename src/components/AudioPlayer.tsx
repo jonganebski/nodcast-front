@@ -2,7 +2,6 @@ import {
   faPause,
   faPlay,
   faStop,
-  faTimes,
   faVolumeDown,
   faVolumeOff,
   faVolumeUp,
@@ -72,7 +71,7 @@ export const AudioPlayer = () => {
 
   return (
     <section
-      className={`fixed z-10 w-full h-20 px-6 grid grid-cols-3 items-center bg-opacity-80 bg-gray-100 transition-all duration-700 ${
+      className={`fixed z-10 w-full h-20 px-6 grid grid-cols-3 items-center bg-opacity-90 bg-gray-200 transition-all duration-700 ${
         track ? "bottom-0 opacity-100" : "-bottom-20 opacity-0"
       }`}
       style={{ boxShadow: "0px 0px 10px 0px rgba(0, 0, 0, 0.1)" }}

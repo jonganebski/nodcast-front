@@ -1,7 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { data } from "autoprefixer";
 import React, { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { uploadFile } from "../api/uploadFile";
@@ -25,6 +24,7 @@ const EDIT_PROFILE_MUTATION = gql`
     editProfile(input: $input) {
       ok
       err
+      avatarUrl
     }
   }
 `;
@@ -69,7 +69,7 @@ export const EditProfileModal: React.FC<IEditProfileModalProps> = ({
 
   const onEditProfileCompleted = (data: editProfileMutation) => {
     const {
-      editProfile: { ok, err },
+      editProfile: { ok, err, avatarUrl },
     } = data;
     if (ok) {
       const { email, username } = getValues();
@@ -81,13 +81,16 @@ export const EditProfileModal: React.FC<IEditProfileModalProps> = ({
             email
             username
             role
+            avatarUrl
             subscriptions {
               id
             }
           }
         `,
-        data: { ...me, email, username },
+        data: { ...me, email, username, avatarUrl },
       });
+
+      setIsEditProfileOpen(false);
     } else if (err) {
       if (err.toLowerCase().includes("email")) {
         setError("email", { message: err });
@@ -121,12 +124,12 @@ export const EditProfileModal: React.FC<IEditProfileModalProps> = ({
       }
     }
     if (password) {
-      editProfileMutation({
-        variables: { input: { email, username, password } },
+      await editProfileMutation({
+        variables: { input: { email, username, avatarUrl, password } },
       });
     } else {
-      editProfileMutation({
-        variables: { input: { email, username } },
+      await editProfileMutation({
+        variables: { input: { email, username, avatarUrl } },
       });
     }
     setEditProfileLoading(false);
@@ -158,7 +161,7 @@ export const EditProfileModal: React.FC<IEditProfileModalProps> = ({
             <div className="grid gap-y-2 mb-4">
               <div className="flex justify-center">
                 <Avatar
-                  me={me}
+                  username={me.username}
                   src={src}
                   size={14}
                   onClick={() => {

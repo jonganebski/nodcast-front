@@ -11,6 +11,7 @@ export interface ReviewParts_creator {
   __typename: "Users";
   id: number;
   username: string;
+  avatarUrl: string | null;
 }
 
 export interface ReviewParts {

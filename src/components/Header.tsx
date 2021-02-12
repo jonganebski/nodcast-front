@@ -20,7 +20,7 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
   const ulRef = useRef<HTMLUListElement | null>(null);
   const [isUserPopup, setIsUserPopup] = useState(false);
   const history = useHistory();
-  const [searchPodcastsQuery, { data, loading }] = useSearchPodcastsQuery();
+  const [searchPodcastsQuery, { data }] = useSearchPodcastsQuery();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -98,7 +98,7 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
         )}
       </div>
       <Avatar
-        me={me}
+        username={me?.username ?? ""}
         src={me?.avatarUrl ?? ""}
         className="my-3"
         onClick={(e) => {
@@ -107,7 +107,7 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
         }}
       >
         {isUserPopup && me && (
-          <ul className="absolute z-10 grid gap-px bg-gray-300 top-12 right-0 border rounded-md shadow-lg whitespace-nowrap overflow-hidden text-sm">
+          <ul className="absolute z-10 grid gap-px bg-gray-300 top-10 right-10 border rounded-md shadow-lg whitespace-nowrap overflow-hidden text-sm">
             <li
               className="px-10 py-3 bg-white hover:bg-gray-100"
               onClick={() => history.push("/")}
@@ -150,7 +150,7 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
               className="px-10 py-3 bg-white hover:bg-gray-100"
               onClick={() => setIsEditProfileOpen(true)}
             >
-              Edit profile
+              <span>{me.email}</span>
             </li>
             <li
               className="px-10 py-3 bg-white hover:bg-gray-100"

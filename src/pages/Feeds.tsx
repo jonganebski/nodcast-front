@@ -1,5 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import React from "react";
+import { Helmet } from "react-helmet-async";
 import { EpisodeBlock } from "../components/EpisodeBlock";
 import { EpisodeBlockSkeleton } from "../components/EpisodeBlockSkeleton";
 import { EPISODE_FRAGMENT } from "../fragments";
@@ -27,6 +28,9 @@ export const Feeds = () => {
 
   return (
     <main className="container">
+      <Helmet>
+        <title>Latest Feeds | Nodcast</title>
+      </Helmet>
       <h2 className="text-lg">Latest feeds ⚡</h2>
       <ul className="grid gap-px bg-gray-200">
         {loading

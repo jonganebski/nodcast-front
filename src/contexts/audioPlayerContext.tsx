@@ -1,6 +1,7 @@
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
 interface ITrack {
+  episodeId: number;
   audioUrl: string;
   podcastTitle: string;
   episodeTitle: string;
@@ -21,7 +22,7 @@ export const AudioPlayerContextProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [track, setTrack] = useState<ITrack | null>(null);
   const [isPaused, setIsPaused] = useState(false);
-  console.log(track, isPaused);
+
   return (
     <AudioPlayerContext.Provider
       value={{

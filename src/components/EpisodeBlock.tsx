@@ -76,19 +76,26 @@ export const EpisodeBlock: React.FC<IEpisodeBlockProps> = ({
         <div className="flex justify-between">
           <Button
             text={shapeAudioDuration(episode.dutationSeconds)}
-            loading={!isPaused && !!track}
+            loading={!!(!isPaused && track && track.episodeId === episode.id)}
             icon={faPlayCircle}
             onClick={() => {
-              if (track) {
+              if (track && track.episodeId === episode.id) {
                 setIsPaused(true);
               } else {
-                if (episode.title && episode.audioUrl && podcastTitle) {
+                if (
+                  episode.id &&
+                  episode.title &&
+                  episode.audioUrl &&
+                  podcastTitle
+                ) {
                   setTrack({
+                    episodeId: episode.id,
                     audioUrl: episode.audioUrl,
                     episodeTitle: episode.title,
                     podcastTitle,
                     coverUrl: coverUrl ?? "",
                   });
+                  setIsPaused(false);
                 }
               }
             }}

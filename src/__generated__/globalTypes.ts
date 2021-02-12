@@ -42,6 +42,10 @@ export interface DeleteEpisodeInput {
   episodeId: number;
 }
 
+export interface DeletePodcastInput {
+  podcastId: number;
+}
+
 export interface EditEpisodeInput {
   episodeId: number;
   title: string;
@@ -61,6 +65,7 @@ export interface EditPodcastInput {
 export interface EditProfileInput {
   email: string;
   username: string;
+  avatarUrl?: string | null;
   password?: string | null;
 }
 

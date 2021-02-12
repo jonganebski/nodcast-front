@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { FormProvider, useForm } from "react-hook-form";
 import { Alert } from "../../components/Alert";
 import { EpisodeBlock } from "../../components/EpisodeBlock";
@@ -76,6 +77,9 @@ export const Episodes = () => {
 
   return (
     <main className="container">
+      <Helmet>
+        <title>My Episodes | Nodcast</title>
+      </Helmet>
       <button
         className={`w-full py-2 focus:outline-none ${
           isDrawerOpen ? "shadow-inner" : "shadow-md"

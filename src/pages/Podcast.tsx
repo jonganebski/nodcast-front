@@ -139,10 +139,11 @@ export const Podcast = () => {
     }
     return 0;
   };
+
   return (
     <main className="container">
       <Helmet>
-        <title>Podcast | Nodcast</title>
+        <title>{data?.getPodcast.podcast?.title} | Nodcast</title>
       </Helmet>
       <section className="mb-8">
         <div className="flex justify-between mb-3">
@@ -166,7 +167,7 @@ export const Podcast = () => {
                     </span>
                   </div>
                 </div>
-                <h5 className="text-xs text-gray-600">
+                <h5 className="my-2 text-xs text-gray-600">
                   {data?.getPodcast.podcast?.creator?.username}
                 </h5>
               </>
@@ -256,7 +257,13 @@ export const Podcast = () => {
                 .slice()
                 .sort(sortEpisodes)
                 .map((episode) => {
-                  return <EpisodeBlock episode={episode} key={episode.id} />;
+                  return (
+                    <EpisodeBlock
+                      episode={episode}
+                      podcastTitle={data.getPodcast.podcast?.title}
+                      key={episode.id}
+                    />
+                  );
                 })}
         </ul>
       </section>

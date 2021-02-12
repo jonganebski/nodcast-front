@@ -1,17 +1,16 @@
 import { gql, useQuery } from "@apollo/client";
 import { faPlayCircle } from "@fortawesome/free-solid-svg-icons";
 import React from "react";
+import { Helmet } from "react-helmet-async";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "../components/Button";
 import { PodcastCover } from "../components/PodcastCover";
 import { EPISODE_FRAGMENT } from "../fragments";
 import { computeTimelapse, shapeAudioDuration } from "../helpers";
-import { useMeQuery } from "../hooks/useMeQuery";
 import {
   getEpisodeQuery,
   getEpisodeQueryVariables,
 } from "../__generated__/getEpisodeQuery";
-import { UserRole } from "../__generated__/globalTypes";
 
 const GET_EPISODE_QUERY = gql`
   query getEpisodeQuery($input: GetEpisodeInput!) {
@@ -43,6 +42,9 @@ export const Episode = () => {
 
   return (
     <main className="container">
+      <Helmet>
+        <title>{data?.getEpisode.episode?.title} | Nodcast</title>
+      </Helmet>
       <section className="flex mb-10">
         <PodcastCover coverUrl="" title="" size={12} />
         <div className="ml-5">

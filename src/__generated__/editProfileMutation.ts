@@ -13,6 +13,7 @@ export interface editProfileMutation_editProfile {
   __typename: "EditProfileOutput";
   ok: boolean;
   err: string | null;
+  avatarUrl: string | null;
 }
 
 export interface editProfileMutation {

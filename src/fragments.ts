@@ -31,6 +31,7 @@ export const REVIEW_FRAGMENT = gql`
     creator {
       id
       username
+      avatarUrl
     }
   }
 `;

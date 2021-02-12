@@ -48,6 +48,10 @@ export const CategorySection: React.FC<ICategorySectionProps> = ({
                 <PodcastBlock podcast={podcast} index={index} key={index} />
               );
             })}
+            {category.podcasts.length < 5 &&
+              Array(5 - category.podcasts.length)
+                .fill(0)
+                .map((_, i) => <div className="w-28" key={i}></div>)}
           </ul>
         </div>
         {page !== 1 && (

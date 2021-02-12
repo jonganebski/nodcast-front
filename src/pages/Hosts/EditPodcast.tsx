@@ -1,21 +1,29 @@
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { FormProvider, useForm } from "react-hook-form";
 import { useHistory } from "react-router-dom";
 import { uploadFile } from "../../api/uploadFile";
+import { Alert } from "../../components/Alert";
 import { IPodcastForm, PodcastForm } from "../../components/PodcastForm";
+import { useDeletePodcastMutation } from "../../hooks/mutations/useDeletePodcast";
 import { useEditPodcastMutation } from "../../hooks/mutations/useEditPodcastMutation";
 import { useGetPodcastQuery } from "../../hooks/useGetPodcastQuery";
 
 export const EditPodcast = () => {
-  const { data, loading: pageLoading } = useGetPodcastQuery();
+  const { data } = useGetPodcastQuery();
   const history = useHistory();
   const [src, setSrc] = useState("");
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [isDeleteAlert, setIsDeleteAlert] = useState(false);
   const formMethods = useForm<IPodcastForm>({
     mode: "onChange",
   });
   const { setValue, getValues } = formMethods;
   const [editPodcastMutation] = useEditPodcastMutation(data?.getPodcast);
+  const [
+    deletePodcastMutation,
+    { loading: deletePodcastLoading },
+  ] = useDeletePodcastMutation();
 
   useEffect(() => {
     const podcast = data?.getPodcast.podcast;
@@ -81,9 +89,14 @@ export const EditPodcast = () => {
       history.push("/");
     }
   };
-
+  if (!data?.getPodcast.podcast) {
+    return null;
+  }
   return (
     <main className="container">
+      <Helmet>
+        <title>Edit Podcast | Nodcast</title>
+      </Helmet>
       <FormProvider {...formMethods}>
         <PodcastForm
           categories={data?.getPodcast.categories}
@@ -94,6 +107,33 @@ export const EditPodcast = () => {
           editTarget={data?.getPodcast.podcast}
         />
       </FormProvider>
+      <div className="mt-10 flex justify-end">
+        <span
+          className="text-sm underline text-red-600 cursor-pointer hover:text-red-500"
+          onClick={() => setIsDeleteAlert(true)}
+        >
+          Delete podcast
+        </span>
+      </div>
+      {isDeleteAlert && (
+        <Alert
+          text={`You are deleting podcast "${data?.getPodcast.podcast?.title}" and it's entire episodes.`}
+          actionText="Delete"
+          actionLoading={deletePodcastLoading}
+          actionCallBack={async () => {
+            if (data?.getPodcast.podcast) {
+              deletePodcastMutation({
+                variables: {
+                  input: { podcastId: data?.getPodcast.podcast.id },
+                },
+              });
+            }
+          }}
+          cancelCallBack={() => {
+            setIsDeleteAlert(false);
+          }}
+        />
+      )}
     </main>
   );
 };

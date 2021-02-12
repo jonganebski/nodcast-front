@@ -1,5 +1,6 @@
 import { faHeadphones, faPenNib } from "@fortawesome/free-solid-svg-icons";
 import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { FormProvider, useForm } from "react-hook-form";
 import { uploadFile } from "../../api/uploadFile";
 import { Button } from "../../components/Button";
@@ -28,7 +29,7 @@ export const Home = () => {
     setSubmitLoading(true);
     const { categories, title, description, files } = getValues();
     const file = files?.[0];
-    let coverUrl = "";
+    let coverUrl = null;
     if (file) {
       try {
         const formData = new FormData();
@@ -65,7 +66,7 @@ export const Home = () => {
         const { data: audioFile } = e;
         const link = document.createElement("a");
         link.href = URL.createObjectURL(audioFile);
-        link.download = "nodcast-recorded.webm";
+        link.download = "nodcast-recorded.wav";
         document.body.appendChild(link);
         link.click();
       };
@@ -75,6 +76,9 @@ export const Home = () => {
 
   return (
     <main className="grid gap-y-10 place-items-center w-full max-w-screen-2xl px-1 mx-auto">
+      <Helmet>
+        <title>Welcome! | Nodcast</title>
+      </Helmet>
       {loading ? null : data?.getPodcast.podcast ? (
         <>
           <h2 className="">{data.getPodcast.podcast.title}</h2>

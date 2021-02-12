@@ -11,6 +11,7 @@ import {
 } from "../__generated__/editReviewMutation";
 import { getReviewsQuery_getReviews_reviews } from "../__generated__/getReviewsQuery";
 import { meQuery } from "../__generated__/meQuery";
+import { Avatar } from "./Avatar";
 import { ReviewForm } from "./ReviewForm";
 
 interface IReviewBlockProps {
@@ -93,10 +94,17 @@ export const ReviewBlock: React.FC<IReviewBlockProps> = ({
   return (
     <li className="py-4 bg-white">
       <div className="flex justify-between items-center mb-1">
-        <h6 className="text-sm text-gray-900">
-          {review.creator.username}{" "}
-          {podcastCreatorId === review.creator.id && <span>🎙</span>}
-        </h6>
+        <div className="flex items-center">
+          <Avatar
+            src={review.creator.avatarUrl ?? ""}
+            username={review.creator.username}
+            size={6}
+          />
+          <h6 className="ml-2 text-sm text-gray-900">
+            {review.creator.username}{" "}
+            {podcastCreatorId === review.creator.id && <span>🎙</span>}
+          </h6>
+        </div>
         {userData.me.id === review.creator.id && (
           <FontAwesomeIcon
             className="text-gray-400 text-sm cursor-pointer hover:text-gray-700 active:text-gray-500"
@@ -111,7 +119,7 @@ export const ReviewBlock: React.FC<IReviewBlockProps> = ({
         </FormProvider>
       ) : (
         <p
-          className="text-gray-800 text-sm overflow-ellipsis overflow-hidden whitespace-pre"
+          className="text-gray-800 text-sm overflow-ellipsis overflow-hidden"
           style={{
             display: "-webkit-box",
             WebkitLineClamp: 5,

@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { NICO_URL, LYNN_URL, DEFAULT_COVER } from "../constants";
 import { computeTimelapse } from "../helpers";
 import { getCategoriesQueryListner_getCategories_categories_podcasts } from "../__generated__/getCategoriesQueryListner";
 import { PodcastCover } from "./PodcastCover";

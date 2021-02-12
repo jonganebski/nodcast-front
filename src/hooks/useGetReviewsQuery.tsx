@@ -24,7 +24,7 @@ export const GET_REVIEWS_QUERY = gql`
 export const useGetReviewsLazyQuery = (podcastId: number) => {
   const onCompleted = (data: getReviewsQuery) => {
     const {
-      getReviews: { ok, reviews, err, currentPage },
+      getReviews: { ok, reviews, err },
     } = data;
     if (ok && reviews) {
       client.writeQuery<getReviewsQuery, getReviewsQueryVariables>({

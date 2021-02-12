@@ -20,5 +20,6 @@ export interface EditedUser {
   email: string;
   username: string;
   role: UserRole;
+  avatarUrl: string | null;
   subscriptions: EditedUser_subscriptions[];
 }

@@ -90,6 +90,7 @@ export const ReviewsDrawer: React.FC<IReviewsDrawerProps> = ({
             __typename: "Users",
             id: userData.me.id,
             username: userData.me.username,
+            avatarUrl: userData.me.avatarUrl,
           },
         };
         client.writeQuery<getReviewsQuery, getReviewsQueryVariables>({

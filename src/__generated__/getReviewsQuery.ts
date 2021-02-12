@@ -13,6 +13,7 @@ export interface getReviewsQuery_getReviews_reviews_creator {
   __typename: "Users";
   id: number;
   username: string;
+  avatarUrl: string | null;
 }
 
 export interface getReviewsQuery_getReviews_reviews {

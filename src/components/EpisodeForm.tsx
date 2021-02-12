@@ -31,6 +31,7 @@ export const EpisodeForm: React.FC<IEpisodeFromProps> = ({
   editTarget,
 }) => {
   const [serverErr, setServerErr] = useState("");
+  const [submitLoading, setSubmitLoading] = useState(false);
   const {
     handleSubmit,
     errors,
@@ -39,16 +40,11 @@ export const EpisodeForm: React.FC<IEpisodeFromProps> = ({
     watch,
     reset,
     formState,
+    setValue,
   } = useFormContext<IFormProps>();
-  const [
-    createEpisodeMutation,
-    { loading: createEpisodeLoading },
-  ] = useCreateEpisodeMutation(resetDrawer);
+  const [createEpisodeMutation] = useCreateEpisodeMutation(resetDrawer);
 
-  const [
-    editEpisodeMutation,
-    { loading: editEpisodeLoading },
-  ] = useEditRpisodeMutation(resetDrawer);
+  const [editEpisodeMutation] = useEditRpisodeMutation(resetDrawer);
 
   const loadFile = (files: FileList | null) => {
     if (files && files?.[0]) {
@@ -85,6 +81,7 @@ export const EpisodeForm: React.FC<IEpisodeFromProps> = ({
     if (!fileInfo?.duration) {
       return;
     }
+    setSubmitLoading(true);
     const { files, title, description } = getValues();
     if (editTarget) {
       let audioUrl = editTarget.audioUrl;
@@ -92,15 +89,18 @@ export const EpisodeForm: React.FC<IEpisodeFromProps> = ({
         const formData = new FormData();
         formData.append("file", files[0]);
         try {
-          const { ok, url } = await uploadFile(formData);
+          const { ok, url, err } = await uploadFile(formData);
           if (ok && url) {
             audioUrl = url;
+          } else {
+            console.log(err);
           }
-        } catch {
+        } catch (err) {
+          console.log(err);
           setServerErr("Failed to submit");
         }
       }
-      editEpisodeMutation({
+      await editEpisodeMutation({
         variables: {
           input: {
             episodeId: editTarget.id,
@@ -115,9 +115,9 @@ export const EpisodeForm: React.FC<IEpisodeFromProps> = ({
       const formData = new FormData();
       formData.append("file", files[0]);
       try {
-        const { ok, url } = await uploadFile(formData);
+        const { ok, url, err } = await uploadFile(formData);
         if (ok && url) {
-          createEpisodeMutation({
+          await createEpisodeMutation({
             variables: {
               input: {
                 title,
@@ -128,19 +128,22 @@ export const EpisodeForm: React.FC<IEpisodeFromProps> = ({
             },
           });
         } else {
+          console.log(err);
           throw new Error();
         }
-      } catch {
+      } catch (err) {
+        console.log(err);
         setServerErr("Failed to submit");
       }
     }
+    setSubmitLoading(false);
   };
 
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const { files } = e.dataTransfer;
     if (fileInputRef.current) {
-      fileInputRef.current.files = files;
+      setValue("files", files, { shouldValidate: true });
       loadFile(files);
     }
   };
@@ -148,6 +151,7 @@ export const EpisodeForm: React.FC<IEpisodeFromProps> = ({
   const onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
+
   return (
     <form
       className="grid gap-y-5 py-5 border-b"
@@ -176,7 +180,7 @@ export const EpisodeForm: React.FC<IEpisodeFromProps> = ({
         {errors.files && <FormError err={errors.files.message} />}
       </div>
       <input
-        className="hidden"
+        // className="hidden"
         ref={(ref) => {
           register(ref, {
             required: editTarget ? false : EPISODE_FORM.FILE_REQUIRED_ERR,
@@ -185,7 +189,7 @@ export const EpisodeForm: React.FC<IEpisodeFromProps> = ({
         }}
         onChange={(e) => loadFile(e.currentTarget.files)}
         multiple={false}
-        accept="audio/*"
+        accept="audio/wav, audio/mpeg"
         name="files"
         type="file"
       />
@@ -231,7 +235,7 @@ export const EpisodeForm: React.FC<IEpisodeFromProps> = ({
       </label>
       <ButtonWide
         text={editTarget ? "Edit episode" : "Create episode"}
-        loading={createEpisodeLoading || editEpisodeLoading}
+        loading={submitLoading}
         disabled={!formState.isValid}
       />
       {serverErr && <FormError err={serverErr} />}
