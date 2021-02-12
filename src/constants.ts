@@ -1,7 +1,9 @@
 export const TOKEN_NAME = "challenge-token";
 
-// export const SERVER_URI = "https://nodcast.herokuapp.com";
-export const SERVER_URI = "http://localhost:4000";
+export const SERVER_URI =
+  process.env.NODE_ENV === "production"
+    ? "https://nodcast.herokuapp.com"
+    : "http://localhost:4000";
 
 export const MONTHS = [
   "Jan",
