@@ -36,7 +36,10 @@ export const EpisodeBlock: React.FC<IEpisodeBlockProps> = ({
     <li className="bg-white py-5 flex">
       {episode.podcast && location.pathname.includes("feeds") && (
         <Link to={`/podcasts/${episode.podcast.id}`} className="mr-5">
-          <PodcastCover coverUrl="" title={episode.podcast.title} />
+          <PodcastCover
+            coverUrl={coverUrl ?? ""}
+            title={episode.podcast.title}
+          />
         </Link>
       )}
       <div className="w-full">

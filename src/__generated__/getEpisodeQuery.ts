@@ -13,6 +13,7 @@ export interface getEpisodeQuery_getEpisode_episode_podcast {
   __typename: "Podcast";
   id: number;
   title: string;
+  coverUrl: string | null;
 }
 
 export interface getEpisodeQuery_getEpisode_episode {

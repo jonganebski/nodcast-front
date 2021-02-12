@@ -11,7 +11,6 @@ export const PodcastCover: React.FC<IPodcastCover> = ({
   title,
   size = 28,
 }) => {
-  console.log(coverUrl);
   return (
     <div
       className={`relative z-0 bg-gray-700 w-${size} h-${size} rounded-lg overflow-hidden`}

@@ -16,6 +16,7 @@ const GET_FEED_QUERY = gql`
         podcast {
           id
           title
+          coverUrl
         }
       }
     }
@@ -42,7 +43,13 @@ export const Feeds = () => {
                 );
               })
           : data?.getFeed.episodes?.map((episode) => {
-              return <EpisodeBlock episode={episode} key={episode.id} />;
+              return (
+                <EpisodeBlock
+                  episode={episode}
+                  coverUrl={episode.podcast.coverUrl}
+                  key={episode.id}
+                />
+              );
             })}
       </ul>
     </main>

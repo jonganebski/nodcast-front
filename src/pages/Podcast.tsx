@@ -260,6 +260,7 @@ export const Podcast = () => {
                   return (
                     <EpisodeBlock
                       episode={episode}
+                      coverUrl={data.getPodcast.podcast?.coverUrl}
                       podcastTitle={data.getPodcast.podcast?.title}
                       key={episode.id}
                     />

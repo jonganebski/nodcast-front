@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet-async";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "../components/Button";
 import { PodcastCover } from "../components/PodcastCover";
+import { useAudioContext } from "../contexts/audioPlayerContext";
 import { EPISODE_FRAGMENT } from "../fragments";
 import { computeTimelapse, shapeAudioDuration } from "../helpers";
 import {
@@ -22,6 +23,7 @@ const GET_EPISODE_QUERY = gql`
         podcast {
           id
           title
+          coverUrl
         }
       }
     }
@@ -39,6 +41,7 @@ export const Episode = () => {
     GET_EPISODE_QUERY,
     { variables: { input: { episodeId: +episodeId } } }
   );
+  const { setTrack, setIsPaused, track, isPaused } = useAudioContext();
 
   return (
     <main className="container">
@@ -46,7 +49,11 @@ export const Episode = () => {
         <title>{data?.getEpisode.episode?.title ?? ""} | Nodcast</title>
       </Helmet>
       <section className="flex mb-10">
-        <PodcastCover coverUrl="" title="" size={12} />
+        <PodcastCover
+          coverUrl={data?.getEpisode.episode?.podcast.coverUrl ?? ""}
+          title={data?.getEpisode.episode?.podcast.title ?? ""}
+          size={12}
+        />
         <div className="ml-5">
           <h2 className="text-blue-600 cursor-pointer hover:underline">
             <Link to={`/podcasts/${data?.getEpisode.episode?.podcast.id}`}>
@@ -68,6 +75,23 @@ export const Episode = () => {
           )}`}
           icon={faPlayCircle}
           className="mb-8"
+          loading={!!(!isPaused && track && track.episodeId === +episodeId)}
+          onClick={() => {
+            if (track && track.episodeId === +episodeId) {
+              setIsPaused(true);
+            } else {
+              if (data?.getEpisode.episode?.audioUrl) {
+                setTrack({
+                  episodeId: +episodeId,
+                  audioUrl: data?.getEpisode.episode?.audioUrl,
+                  episodeTitle: data.getEpisode.episode.title,
+                  podcastTitle: data.getEpisode.episode.podcast.title,
+                  coverUrl: data.getEpisode.episode.podcast.coverUrl ?? "",
+                });
+                setIsPaused(false);
+              }
+            }
+          }}
         />
         <p className="text-sm text-gray-700">
           {data?.getEpisode.episode?.description}

@@ -11,6 +11,7 @@ export interface getFeedQuery_getFeed_episodes_podcast {
   __typename: "Podcast";
   id: number;
   title: string;
+  coverUrl: string | null;
 }
 
 export interface getFeedQuery_getFeed_episodes {

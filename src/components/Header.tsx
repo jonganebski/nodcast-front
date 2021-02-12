@@ -77,7 +77,7 @@ export const Header: React.FC<IHeaderProps> = ({ me }) => {
         )}
         {showSearchResults && (
           <ul
-            className="grid absolute border rounded-b-md overflow-hidden w-full gap-px bg-gray-200 shadow-md"
+            className="grid absolute z-10 border rounded-b-md overflow-hidden w-full gap-px bg-gray-200 shadow-md"
             ref={ulRef}
           >
             {data?.searchPodcasts.podcasts?.map((podcast) => {
