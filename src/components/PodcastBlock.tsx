@@ -6,16 +6,13 @@ import { PodcastCover } from "./PodcastCover";
 
 interface IPodcastBlock {
   podcast: getCategoriesQueryListner_getCategories_categories_podcasts;
-  index: number;
 }
 
-const src = "";
-
-export const PodcastBlock: React.FC<IPodcastBlock> = ({ podcast, index }) => {
+export const PodcastBlock: React.FC<IPodcastBlock> = ({ podcast }) => {
   return (
     <li className="w-28">
       <Link to={`/podcasts/${podcast.id}`}>
-        <PodcastCover coverUrl={src} title={podcast.title} />
+        <PodcastCover coverUrl={podcast.coverUrl ?? ""} title={podcast.title} />
         <h5
           className="text-sm overflow-ellipsis overflow-hidden"
           style={{

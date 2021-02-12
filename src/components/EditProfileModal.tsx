@@ -163,7 +163,7 @@ export const EditProfileModal: React.FC<IEditProfileModalProps> = ({
                 <Avatar
                   username={me.username}
                   src={src}
-                  size={14}
+                  size="lg"
                   onClick={() => {
                     if (fileInputRef.current) {
                       fileInputRef.current.click();

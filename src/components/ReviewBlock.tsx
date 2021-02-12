@@ -98,7 +98,7 @@ export const ReviewBlock: React.FC<IReviewBlockProps> = ({
           <Avatar
             src={review.creator.avatarUrl ?? ""}
             username={review.creator.username}
-            size={6}
+            size="sm"
           />
           <h6 className="ml-2 text-sm text-gray-900">
             {review.creator.username}{" "}

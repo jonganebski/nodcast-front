@@ -15,7 +15,7 @@
 
 @tailwind utilities;
 
-/* @layer utilities {
+@layer utilities {
   .loading-indicator {
     display: inline-block;
     position: relative;
@@ -53,4 +53,4 @@
       height: 8px;
     }
   }
-} */
+}

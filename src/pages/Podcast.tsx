@@ -143,7 +143,7 @@ export const Podcast = () => {
   return (
     <main className="container">
       <Helmet>
-        <title>{data?.getPodcast.podcast?.title} | Nodcast</title>
+        <title>{data?.getPodcast.podcast?.title ?? ""} | Nodcast</title>
       </Helmet>
       <section className="mb-8">
         <div className="flex justify-between mb-3">
@@ -211,7 +211,7 @@ export const Podcast = () => {
             <div className="animate-pulse bg-gray-200 rounded-lg mb-1 w-28 h-28"></div>
           ) : (
             <PodcastCover
-              coverUrl=""
+              coverUrl={data?.getPodcast.podcast?.coverUrl ?? ""}
               title={data?.getPodcast.podcast?.title ?? ""}
             />
           )}

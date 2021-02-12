@@ -44,9 +44,7 @@ export const CategorySection: React.FC<ICategorySectionProps> = ({
             }}
           >
             {category.podcasts.map((podcast, index) => {
-              return (
-                <PodcastBlock podcast={podcast} index={index} key={index} />
-              );
+              return <PodcastBlock podcast={podcast} key={index} />;
             })}
             {category.podcasts.length < 5 &&
               Array(5 - category.podcasts.length)

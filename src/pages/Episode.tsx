@@ -43,7 +43,7 @@ export const Episode = () => {
   return (
     <main className="container">
       <Helmet>
-        <title>{data?.getEpisode.episode?.title} | Nodcast</title>
+        <title>{data?.getEpisode.episode?.title ?? ""} | Nodcast</title>
       </Helmet>
       <section className="flex mb-10">
         <PodcastCover coverUrl="" title="" size={12} />

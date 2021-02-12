@@ -3,7 +3,7 @@ import React, { ReactNode } from "react";
 interface IAvatarProps {
   src: string;
   username: string;
-  size?: number;
+  size?: "sm" | "md" | "lg";
   className?: string;
   children?: ReactNode;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
@@ -12,7 +12,7 @@ interface IAvatarProps {
 export const Avatar: React.FC<IAvatarProps> = ({
   src,
   username,
-  size = 11,
+  size = "md",
   className,
   onClick,
   children,
@@ -20,7 +20,9 @@ export const Avatar: React.FC<IAvatarProps> = ({
   return (
     <div className={`relative cursor-pointer ${className}`} onClick={onClick}>
       <div
-        className={`w-${size} h-${size} rounded-full flex items-center justify-center bg-gray-600 overflow-hidden`}
+        className={`rounded-full flex items-center justify-center bg-gray-600 overflow-hidden ${
+          size === "sm" ? "w-6 h-6" : size === "md" ? "w-9 h-9" : "w-14 h-14"
+        }`}
       >
         {src ? (
           <img

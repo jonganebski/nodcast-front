@@ -27,8 +27,7 @@ export const Home = () => {
   const { data, loading } = useQuery<getCategoriesQueryListner>(
     GET_CATEGORIES_QUERY_LISTENER
   );
-  console.log(loading);
-  console.log(data);
+
   return (
     <main className="container grid gap-10">
       <Helmet>

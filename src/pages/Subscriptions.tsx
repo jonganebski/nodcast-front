@@ -47,9 +47,7 @@ export const Subscriptions = () => {
                   new Date(a.updatedAt).getTime()
               )
               .map((podcast, i) => {
-                return (
-                  <PodcastBlock podcast={podcast} index={i} key={podcast.id} />
-                );
+                return <PodcastBlock podcast={podcast} key={podcast.id} />;
               })}
       </ul>
     </main>
