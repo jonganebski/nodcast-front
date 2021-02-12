@@ -3,17 +3,19 @@ import React from "react";
 interface IPodcastCover {
   coverUrl: string;
   title: string;
-  size?: number;
+  size: "sm" | "md" | "lg";
 }
 
 export const PodcastCover: React.FC<IPodcastCover> = ({
   coverUrl,
   title,
-  size = 28,
+  size,
 }) => {
   return (
     <div
-      className={`relative z-0 bg-gray-700 w-${size} h-${size} rounded-lg overflow-hidden`}
+      className={`relative z-0 bg-gray-700 rounded-lg overflow-hidden ${
+        size === "sm" ? "w-12 h-12" : size === "md" ? "w-20 h-20" : "w-28 h-28"
+      }`}
     >
       {coverUrl ? (
         <img

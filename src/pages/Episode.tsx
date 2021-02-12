@@ -52,7 +52,7 @@ export const Episode = () => {
         <PodcastCover
           coverUrl={data?.getEpisode.episode?.podcast.coverUrl ?? ""}
           title={data?.getEpisode.episode?.podcast.title ?? ""}
-          size={12}
+          size="sm"
         />
         <div className="ml-5">
           <h2 className="text-blue-600 cursor-pointer hover:underline">

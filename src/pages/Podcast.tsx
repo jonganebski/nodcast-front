@@ -213,6 +213,7 @@ export const Podcast = () => {
             <PodcastCover
               coverUrl={data?.getPodcast.podcast?.coverUrl ?? ""}
               title={data?.getPodcast.podcast?.title ?? ""}
+              size="lg"
             />
           )}
         </div>

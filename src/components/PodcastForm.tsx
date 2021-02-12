@@ -73,7 +73,7 @@ export const PodcastForm: React.FC<IPodcastFormProps> = ({
             }
           }}
         >
-          <PodcastCover size={28} coverUrl={src} title={watch().title} />
+          <PodcastCover size="lg" coverUrl={src} title={watch().title} />
         </div>
         <input
           className="hidden"

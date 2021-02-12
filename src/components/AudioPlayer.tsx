@@ -93,7 +93,7 @@ export const AudioPlayer = () => {
       <div className="flex items-center">
         <PodcastCover
           coverUrl={track?.coverUrl ?? ""}
-          size={12}
+          size="sm"
           title={track?.podcastTitle ?? ""}
         />
         <div className="ml-4 text-sm">

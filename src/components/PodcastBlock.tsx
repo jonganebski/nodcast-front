@@ -12,7 +12,11 @@ export const PodcastBlock: React.FC<IPodcastBlock> = ({ podcast }) => {
   return (
     <li className="w-28">
       <Link to={`/podcasts/${podcast.id}`}>
-        <PodcastCover coverUrl={podcast.coverUrl ?? ""} title={podcast.title} />
+        <PodcastCover
+          coverUrl={podcast.coverUrl ?? ""}
+          title={podcast.title}
+          size="lg"
+        />
         <h5
           className="text-sm overflow-ellipsis overflow-hidden"
           style={{

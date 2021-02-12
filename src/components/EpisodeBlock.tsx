@@ -39,6 +39,7 @@ export const EpisodeBlock: React.FC<IEpisodeBlockProps> = ({
           <PodcastCover
             coverUrl={coverUrl ?? ""}
             title={episode.podcast.title}
+            size="lg"
           />
         </Link>
       )}
