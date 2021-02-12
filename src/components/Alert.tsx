@@ -36,7 +36,7 @@ export const Alert: React.FC<IAlertProps> = ({
         </div>
         <h1 className="mb-4 font-semibold">{text}</h1>
         <div className="mb-7">
-          <p>This action cannot be revert this action.</p>
+          <p>This action cannot be reverted.</p>
           <p>Are you sure?</p>
         </div>
         <div className="w-full flex justify-end">
